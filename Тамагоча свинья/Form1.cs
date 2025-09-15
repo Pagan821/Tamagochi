@@ -179,31 +179,31 @@ namespace Тамагоча_свинья
 
                 if (energy <= 20)
                 {
-                    imagePath = @"C:\Users\User\Documents\PigsImage\PigSleep.png";
+                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigSleep.png";
                     lblStatus.Text = "Поросенок Визенау хочет спать!";
                 }
                 else if (hunger <= 20)
                 {
-                    imagePath = @"C:\Users\User\Documents\PigsImage\PigHungry.png";
+                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigHungry.png";
                     lblStatus.Text = "Поросенок Визенау голоден!";
                 }
                 else if (cleanliness <= 20)
                 {
-                    imagePath = @"C:\Users\User\Documents\PigsImage\PigFilthy.png";
+                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigFilthy.png";
                     lblStatus.Text = "Поросенок Визенау грязный!";
                 }
                 else if (happiness <= 20)
                 {
-                    imagePath = @"C:\Users\User\Documents\PigsImage\PigSad.png";
+                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigSad.png";
                     lblStatus.Text = "Поросенок Визенау грустит!";
                 }
                 else if (hunger >= 80 && happiness >= 80 && cleanliness >= 80 && energy >= 80)
                 {
-                    imagePath = @"C:\Users\User\Documents\PigsImage\PigHappy.png";
+                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigHappy.png";
                 }
                 else
                 {
-                    imagePath = @"C:\Users\User\Documents\PigsImage\Pig.png";
+                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\Pig.png";
                 }
 
                 if (System.IO.File.Exists(imagePath))
