@@ -30,8 +30,13 @@ namespace Тамагоча_свинья
         private Button btnClean;
         private Button btnPlay;
         private Button btnSleep;
+        private Button btnRestart;
         private PictureBox picPet;
         private Timer timerGame;
+
+        // Добавляем константы для первоначальных размеров
+        private const int OriginalWidth = 500;
+        private const int OriginalHeight = 650;
 
         public MainForm()
         {
@@ -42,15 +47,19 @@ namespace Тамагоча_свинья
         private void InitializeCustomComponents()
         {
             this.Text = "Тамагочи - Поросенок Визенау";
-            this.Size = new Size(500, 600);
+            this.Size = new Size(OriginalWidth, OriginalHeight);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.LightBlue;
+            this.MinimumSize = new Size(500, 600); // Минимальный размер окна
 
             picPet = new PictureBox();
             picPet.Size = new Size(200, 200);
             picPet.Location = new Point(150, 20);
             picPet.BorderStyle = BorderStyle.FixedSingle;
             picPet.BackColor = Color.White;
+            picPet.SizeMode = PictureBoxSizeMode.Zoom;
+            // Настраиваем Anchor для PictureBox - будет центрироваться по горизонтали
+            picPet.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(picPet);
 
             lblStatus = new Label();
@@ -58,6 +67,8 @@ namespace Тамагоча_свинья
             lblStatus.Size = new Size(400, 30);
             lblStatus.Font = new Font("Arial", 14, FontStyle.Bold);
             lblStatus.TextAlign = ContentAlignment.MiddleCenter;
+            // Настраиваем Anchor для статуса - будет растягиваться по ширине
+            lblStatus.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(lblStatus);
 
             int yPos = 280;
@@ -83,6 +94,22 @@ namespace Тамагоча_свинья
             btnPlay = CreateButton("Поиграть", 250, yPos);
             btnSleep = CreateButton("Уложить спать", 350, yPos);
 
+            yPos += 40; // Отступ для кнопки рестарта
+
+            // Кнопка рестарта
+            btnRestart = new Button();
+            btnRestart.Location = new Point(150, yPos);
+            btnRestart.Size = new Size(200, 35);
+            btnRestart.Text = "Завести нового поросенка";
+            btnRestart.Font = new Font("Arial", 10, FontStyle.Bold);
+            btnRestart.BackColor = Color.LightCoral;
+            btnRestart.ForeColor = Color.DarkRed;
+            btnRestart.Visible = false;
+            // Настраиваем Anchor для кнопки рестарта - будет центрироваться по горизонтали
+            btnRestart.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            btnRestart.Click += btnRestart_Click;
+            this.Controls.Add(btnRestart);
+
             timerGame = new Timer();
             timerGame.Interval = 5000;
             timerGame.Tick += timerGame_Tick;
@@ -92,7 +119,8 @@ namespace Тамагоча_свинья
             btnPlay.Click += btnPlay_Click;
             btnSleep.Click += btnSleep_Click;
 
-            this.Load += MainForm_Load; 
+            this.Load += MainForm_Load;
+            this.Resize += MainForm_Resize; // Добавляем обработчик изменения размера
         }
 
         private Label CreateLabel(string text, int y)
@@ -102,6 +130,8 @@ namespace Тамагоча_свинья
             label.Size = new Size(400, 20);
             label.Text = text;
             label.Font = new Font("Arial", 10);
+            // Настраиваем Anchor для меток - будут растягиваться по ширине
+            label.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(label);
             return label;
         }
@@ -114,6 +144,8 @@ namespace Тамагоча_свинья
             pb.Minimum = 0;
             pb.Maximum = 100;
             pb.Value = 50;
+            // Настраиваю Anchor для прогресс-баров - будут растягиваться по ширине
+            pb.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(pb);
             return pb;
         }
@@ -126,8 +158,88 @@ namespace Тамагоча_свинья
             button.Text = text;
             button.Font = new Font("Arial", 9);
             button.BackColor = Color.LightGreen;
+            // Настраиваем Anchor для кнопок действий - будут сохранять позицию относительно левого и правого краев
+            button.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(button);
             return button;
+        }
+
+        // НОВЫЙ МЕТОД: Обработчик изменения размера формы
+        private void MainForm_Resize(object sender, EventArgs e)
+        {
+            UpdateControlsLayout();
+        }
+
+        // НОВЫЙ МЕТОД: Обновление расположения элементов при изменении размера
+        private void UpdateControlsLayout()
+        {
+            int formWidth = this.ClientSize.Width;
+            int formHeight = this.ClientSize.Height;
+
+            // Обновляем размер и позицию PictureBox
+            int picSize = Math.Min(200, formWidth - 100);
+            picPet.Size = new Size(picSize, picSize);
+            picPet.Location = new Point((formWidth - picSize) / 2, 20);
+
+            // Обновляем позицию и размер статуса
+            lblStatus.Location = new Point(50, picPet.Bottom + 20);
+            lblStatus.Size = new Size(formWidth - 100, 30);
+
+            // Обновляем позиции и размеры прогресс-баров и меток
+            int yPos = lblStatus.Bottom + 20;
+            int controlWidth = formWidth - 100;
+
+            UpdateControlPosition(lblHunger, pbHunger, yPos, controlWidth);
+            yPos += 50;
+
+            UpdateControlPosition(lblHappiness, pbHappiness, yPos, controlWidth);
+            yPos += 50;
+
+            UpdateControlPosition(lblCleanliness, pbCleanliness, yPos, controlWidth);
+            yPos += 50;
+
+            UpdateControlPosition(lblEnergy, pbEnergy, yPos, controlWidth);
+            yPos += 50;
+
+            // Обновляем позиции кнопок действий
+            UpdateActionButtonsPosition(yPos, formWidth);
+            yPos += 40;
+
+            // Обновляем позицию кнопки рестарта
+            btnRestart.Location = new Point((formWidth - 200) / 2, yPos);
+            btnRestart.Size = new Size(Math.Min(200, formWidth - 100), 35);
+        }
+
+        // НОВЫЙ МЕТОД: Обновление позиций меток и прогресс-баров
+        private void UpdateControlPosition(Label label, ProgressBar progressBar, int yPos, int width)
+        {
+            label.Location = new Point(50, yPos);
+            label.Size = new Size(width, 20);
+
+            progressBar.Location = new Point(50, yPos + 25);
+            progressBar.Size = new Size(width, 20);
+        }
+
+        // НОВЫЙ МЕТОД: Обновление позиций кнопок действий
+        private void UpdateActionButtonsPosition(int yPos, int formWidth)
+        {
+            int buttonWidth = (formWidth - 120) / 4; 
+            buttonWidth = Math.Min(100, buttonWidth);
+
+            int totalWidth = buttonWidth * 4 + 30; 
+            int startX = (formWidth - totalWidth) / 2;
+
+            btnFeed.Location = new Point(startX, yPos);
+            btnFeed.Size = new Size(buttonWidth, 30);
+
+            btnClean.Location = new Point(startX + buttonWidth + 10, yPos);
+            btnClean.Size = new Size(buttonWidth, 30);
+
+            btnPlay.Location = new Point(startX + (buttonWidth + 10) * 2, yPos);
+            btnPlay.Size = new Size(buttonWidth, 30);
+
+            btnSleep.Location = new Point(startX + (buttonWidth + 10) * 3, yPos);
+            btnSleep.Size = new Size(buttonWidth, 30);
         }
 
         private void InitializeGame()
@@ -209,7 +321,6 @@ namespace Тамагоча_свинья
                 if (System.IO.File.Exists(imagePath))
                 {
                     picPet.Image = Image.FromFile(imagePath);
-                    picPet.SizeMode = PictureBoxSizeMode.Zoom;
                 }
                 else
                 {
@@ -273,6 +384,35 @@ namespace Тамагоча_свинья
             UpdateStatus();
         }
 
+        private void btnRestart_Click(object sender, EventArgs e)
+        {
+            RestartGame();
+        }
+
+        private void RestartGame()
+        {
+            hunger = 50;
+            happiness = 50;
+            cleanliness = 50;
+            energy = 50;
+
+            btnRestart.Visible = false;
+            SetActionButtonsEnabled(true);
+            timerGame.Start();
+            UpdateStatus();
+
+            MessageBox.Show("У вас появился новый поросенок Визенау! Заботьтесь о нем лучше!", "Новая жизнь",
+                          MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void SetActionButtonsEnabled(bool enabled)
+        {
+            btnFeed.Enabled = enabled;
+            btnClean.Enabled = enabled;
+            btnPlay.Enabled = enabled;
+            btnSleep.Enabled = enabled;
+        }
+
         private void timerGame_Tick(object sender, EventArgs e)
         {
             hunger = Math.Max(0, hunger - 5);
@@ -285,20 +425,19 @@ namespace Тамагоча_свинья
             if (hunger == 0 || happiness == 0 || cleanliness == 0 || energy == 0)
             {
                 timerGame.Stop();
-                MessageBox.Show("Поросенок Визенау пошел на шаурму! Надо было о нем заботится лучше!", "Внимание",MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                SetActionButtonsEnabled(false);
+                btnRestart.Visible = true;
 
-                hunger = 50;
-                happiness = 50;
-                cleanliness = 50;
-                energy = 50;
-                timerGame.Start();
-                UpdateStatus();
+                MessageBox.Show("Поросенок Визенау пошел на шаурму! Надо было о нем заботится лучше!",
+                              "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             UpdatePetImage();
+            // Вызываем обновление layout при загрузке формы
+            UpdateControlsLayout();
         }
     }
 }
