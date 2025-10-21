@@ -34,9 +34,19 @@ namespace Тамагоча_свинья
         private PictureBox picPet;
         private Timer timerGame;
 
+        // Кнопки управления скоростью
+        private Button btnSpeedUp;
+        private Button btnNormalSpeed;
+        private Button btnSpeedDown;
+
         // Добавляем константы для первоначальных размеров
         private const int OriginalWidth = 500;
-        private const int OriginalHeight = 650;
+        private const int OriginalHeight = 700; 
+
+        // Константы скоростей игры (интервалы в миллисекундах)
+        private const int SlowSpeed = 10000;    
+        private const int NormalSpeed = 6000;  
+        private const int FastSpeed = 3000;     
 
         public MainForm()
         {
@@ -50,7 +60,7 @@ namespace Тамагоча_свинья
             this.Size = new Size(OriginalWidth, OriginalHeight);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.LightBlue;
-            this.MinimumSize = new Size(500, 600); // Минимальный размер окна
+            this.MinimumSize = new Size(500, 650); // Увеличил минимальную высоту
 
             picPet = new PictureBox();
             picPet.Size = new Size(200, 200);
@@ -94,6 +104,13 @@ namespace Тамагоча_свинья
             btnPlay = CreateButton("Поиграть", 250, yPos);
             btnSleep = CreateButton("Уложить спать", 350, yPos);
 
+            yPos += 40; // Отступ для кнопок скорости
+
+            // Кнопки управления скоростью
+            btnSpeedDown = CreateSpeedButton("Замедлить", Color.LightBlue, 50, yPos);
+            btnNormalSpeed = CreateSpeedButton("Обычная", Color.LightGreen, 180, yPos);
+            btnSpeedUp = CreateSpeedButton("Ускорить", Color.LightCoral, 310, yPos);
+
             yPos += 40; // Отступ для кнопки рестарта
 
             // Кнопка рестарта
@@ -111,13 +128,18 @@ namespace Тамагоча_свинья
             this.Controls.Add(btnRestart);
 
             timerGame = new Timer();
-            timerGame.Interval = 5000;
+            timerGame.Interval = NormalSpeed; // Начинаем с обычной скорости
             timerGame.Tick += timerGame_Tick;
 
             btnFeed.Click += btnFeed_Click;
             btnClean.Click += btnClean_Click;
             btnPlay.Click += btnPlay_Click;
             btnSleep.Click += btnSleep_Click;
+
+            // Обработчики для кнопок скорости
+            btnSpeedUp.Click += btnSpeedUp_Click;
+            btnNormalSpeed.Click += btnNormalSpeed_Click;
+            btnSpeedDown.Click += btnSpeedDown_Click;
 
             this.Load += MainForm_Load;
             this.Resize += MainForm_Resize; // Добавляем обработчик изменения размера
@@ -164,6 +186,21 @@ namespace Тамагоча_свинья
             return button;
         }
 
+        private Button CreateSpeedButton(string text, Color color, int x, int y)
+        {
+            var button = new Button();
+            button.Location = new Point(x, y);
+            button.Size = new Size(120, 30);
+            button.Text = text;
+            button.Font = new Font("Arial", 9, FontStyle.Bold);
+            button.BackColor = color;
+            button.ForeColor = Color.DarkBlue;
+            // Настраиваем Anchor для кнопок скорости
+            button.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            this.Controls.Add(button);
+            return button;
+        }
+
         // НОВЫЙ МЕТОД: Обработчик изменения размера формы
         private void MainForm_Resize(object sender, EventArgs e)
         {
@@ -205,6 +242,10 @@ namespace Тамагоча_свинья
             UpdateActionButtonsPosition(yPos, formWidth);
             yPos += 40;
 
+            // Обновляем позиции кнопок скорости
+            UpdateSpeedButtonsPosition(yPos, formWidth);
+            yPos += 40;
+
             // Обновляем позицию кнопки рестарта
             btnRestart.Location = new Point((formWidth - 200) / 2, yPos);
             btnRestart.Size = new Size(Math.Min(200, formWidth - 100), 35);
@@ -223,10 +264,10 @@ namespace Тамагоча_свинья
         // НОВЫЙ МЕТОД: Обновление позиций кнопок действий
         private void UpdateActionButtonsPosition(int yPos, int formWidth)
         {
-            int buttonWidth = (formWidth - 120) / 4; 
+            int buttonWidth = (formWidth - 120) / 4;
             buttonWidth = Math.Min(100, buttonWidth);
 
-            int totalWidth = buttonWidth * 4 + 30; 
+            int totalWidth = buttonWidth * 4 + 30;
             int startX = (formWidth - totalWidth) / 2;
 
             btnFeed.Location = new Point(startX, yPos);
@@ -240,6 +281,25 @@ namespace Тамагоча_свинья
 
             btnSleep.Location = new Point(startX + (buttonWidth + 10) * 3, yPos);
             btnSleep.Size = new Size(buttonWidth, 30);
+        }
+
+        // НОВЫЙ МЕТОД: Обновление позиций кнопок скорости
+        private void UpdateSpeedButtonsPosition(int yPos, int formWidth)
+        {
+            int buttonWidth = (formWidth - 40) / 3;
+            buttonWidth = Math.Min(120, buttonWidth);
+
+            int totalWidth = buttonWidth * 3 + 20;
+            int startX = (formWidth - totalWidth) / 2;
+
+            btnSpeedDown.Location = new Point(startX, yPos);
+            btnSpeedDown.Size = new Size(buttonWidth, 30);
+
+            btnNormalSpeed.Location = new Point(startX + buttonWidth + 10, yPos);
+            btnNormalSpeed.Size = new Size(buttonWidth, 30);
+
+            btnSpeedUp.Location = new Point(startX + (buttonWidth + 10) * 2, yPos);
+            btnSpeedUp.Size = new Size(buttonWidth, 30);
         }
 
         private void InitializeGame()
@@ -264,6 +324,7 @@ namespace Тамагоча_свинья
             UpdatePetImage();
         }
 
+      
         private void UpdateOverallStatus()
         {
             if (hunger <= 20 || happiness <= 20 || cleanliness <= 20 || energy <= 20)
@@ -384,6 +445,34 @@ namespace Тамагоча_свинья
             UpdateStatus();
         }
 
+        // Обработчики для кнопок управления скоростью
+        private void btnSpeedUp_Click(object sender, EventArgs e)
+        {
+            timerGame.Interval = FastSpeed;
+            lblStatus.Text = "Скорость игры: Ускоренная";
+            lblStatus.ForeColor = Color.OrangeRed;
+            MessageBox.Show("Скорость игры увеличена!", "Скорость",
+                          MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void btnNormalSpeed_Click(object sender, EventArgs e)
+        {
+            timerGame.Interval = NormalSpeed;
+            lblStatus.Text = "Скорость игры: Обычная";
+            lblStatus.ForeColor = Color.Blue;
+            MessageBox.Show("Скорость игры установлена на обычную.", "Скорость",
+                          MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void btnSpeedDown_Click(object sender, EventArgs e)
+        {
+            timerGame.Interval = SlowSpeed;
+            lblStatus.Text = "Скорость игры: Замедленная";
+            lblStatus.ForeColor = Color.DarkGreen;
+            MessageBox.Show("Скорость игры замедлена.", "Скорость",
+                          MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         private void btnRestart_Click(object sender, EventArgs e)
         {
             RestartGame();
@@ -398,6 +487,7 @@ namespace Тамагоча_свинья
 
             btnRestart.Visible = false;
             SetActionButtonsEnabled(true);
+            timerGame.Interval = NormalSpeed; // Возвращаем обычную скорость
             timerGame.Start();
             UpdateStatus();
 
@@ -411,6 +501,11 @@ namespace Тамагоча_свинья
             btnClean.Enabled = enabled;
             btnPlay.Enabled = enabled;
             btnSleep.Enabled = enabled;
+
+            // Также включаем/выключаем кнопки скорости
+            btnSpeedUp.Enabled = enabled;
+            btnNormalSpeed.Enabled = enabled;
+            btnSpeedDown.Enabled = enabled;
         }
 
         private void timerGame_Tick(object sender, EventArgs e)
