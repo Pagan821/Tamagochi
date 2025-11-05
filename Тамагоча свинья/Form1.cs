@@ -16,21 +16,43 @@ namespace Тамагоча_свинья
         private int happiness = 50;
         private int cleanliness = 50;
         private int energy = 50;
+        private int health = 100;
+        private bool isSick = false;
+        private int sickDays = 0;
+
+        // Система ежедневных потребностей
+        private int dayCounter = 1;
+        private int dailyFeedRequests = 0;
+        private int dailySleepRequests = 0;
+        private int dailyPlayRequests = 0;
+        private int dailyBathRequests = 0;
+        private int maxFeedRequests = 3;    // 3 раза в день хочет есть
+        private int maxSleepRequests = 2;   // 2 раза в день хочет спать
+        private int maxPlayRequests = 2;    // 2 раза в день хочет играть
+        private int maxBathRequests = 1;    // 1 раз в 2 дня хочет купаться
+
+        // Для отслеживания времени
+        private int timerTickCounter = 0;
+        private const int TicksPerDay = 15; // Каждые 15 тиков = 1 день
 
         private Label lblStatus;
         private Label lblHunger;
         private Label lblHappiness;
         private Label lblCleanliness;
         private Label lblEnergy;
+        private Label lblHealth;
+        private Label lblDailyNeeds; // Новый лейбл для отображения потребностей
         private ProgressBar pbHunger;
         private ProgressBar pbHappiness;
         private ProgressBar pbCleanliness;
         private ProgressBar pbEnergy;
+        private ProgressBar pbHealth;
         private Button btnFeed;
         private Button btnClean;
         private Button btnPlay;
         private Button btnSleep;
         private Button btnRestart;
+        private Button btnHeal;
         private PictureBox picPet;
         private Timer timerGame;
 
@@ -41,12 +63,12 @@ namespace Тамагоча_свинья
 
         // Добавляем константы для первоначальных размеров
         private const int OriginalWidth = 500;
-        private const int OriginalHeight = 700; 
+        private const int OriginalHeight = 750;
 
         // Константы скоростей игры (интервалы в миллисекундах)
-        private const int SlowSpeed = 10000;    
-        private const int NormalSpeed = 6000;  
-        private const int FastSpeed = 3000;     
+        private const int SlowSpeed = 10000;
+        private const int NormalSpeed = 6000;
+        private const int FastSpeed = 3000;
 
         public MainForm()
         {
@@ -60,7 +82,7 @@ namespace Тамагоча_свинья
             this.Size = new Size(OriginalWidth, OriginalHeight);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.LightBlue;
-            this.MinimumSize = new Size(500, 650); // Увеличил минимальную высоту
+            this.MinimumSize = new Size(500, 700);
 
             picPet = new PictureBox();
             picPet.Size = new Size(200, 200);
@@ -68,7 +90,6 @@ namespace Тамагоча_свинья
             picPet.BorderStyle = BorderStyle.FixedSingle;
             picPet.BackColor = Color.White;
             picPet.SizeMode = PictureBoxSizeMode.Zoom;
-            // Настраиваем Anchor для PictureBox - будет центрироваться по горизонтали
             picPet.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(picPet);
 
@@ -77,11 +98,20 @@ namespace Тамагоча_свинья
             lblStatus.Size = new Size(400, 30);
             lblStatus.Font = new Font("Arial", 14, FontStyle.Bold);
             lblStatus.TextAlign = ContentAlignment.MiddleCenter;
-            // Настраиваем Anchor для статуса - будет растягиваться по ширине
             lblStatus.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(lblStatus);
 
-            int yPos = 280;
+            // Лейбл для ежедневных потребностей
+            lblDailyNeeds = new Label();
+            lblDailyNeeds.Location = new Point(50, 275);
+            lblDailyNeeds.Size = new Size(400, 40);
+            lblDailyNeeds.Font = new Font("Arial", 9, FontStyle.Italic);
+            lblDailyNeeds.TextAlign = ContentAlignment.MiddleCenter;
+            lblDailyNeeds.ForeColor = Color.DarkBlue;
+            lblDailyNeeds.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            this.Controls.Add(lblDailyNeeds);
+
+            int yPos = 320;
 
             lblHunger = CreateLabel("Голод: 50%", yPos);
             pbHunger = CreateProgressBar(yPos + 25);
@@ -99,19 +129,29 @@ namespace Тамагоча_свинья
             pbEnergy = CreateProgressBar(yPos + 25);
             yPos += 50;
 
+            // Добавляем здоровье
+            lblHealth = CreateLabel("Здоровье: 100%", yPos);
+            pbHealth = CreateProgressBar(yPos + 25);
+            pbHealth.ForeColor = Color.Green;
+            yPos += 50;
+
             btnFeed = CreateButton("Покормить", 50, yPos);
             btnClean = CreateButton("Убрать", 150, yPos);
             btnPlay = CreateButton("Поиграть", 250, yPos);
             btnSleep = CreateButton("Уложить спать", 350, yPos);
 
-            yPos += 40; // Отступ для кнопок скорости
+            yPos += 40;
+
+            // Добавляем кнопку лечения
+            btnHeal = CreateHealButton("Лечить", 150, yPos);
+            yPos += 40;
 
             // Кнопки управления скоростью
             btnSpeedDown = CreateSpeedButton("Замедлить", Color.LightBlue, 50, yPos);
             btnNormalSpeed = CreateSpeedButton("Обычная", Color.LightGreen, 180, yPos);
             btnSpeedUp = CreateSpeedButton("Ускорить", Color.LightCoral, 310, yPos);
 
-            yPos += 40; // Отступ для кнопки рестарта
+            yPos += 40;
 
             // Кнопка рестарта
             btnRestart = new Button();
@@ -122,19 +162,19 @@ namespace Тамагоча_свинья
             btnRestart.BackColor = Color.LightCoral;
             btnRestart.ForeColor = Color.DarkRed;
             btnRestart.Visible = false;
-            // Настраиваем Anchor для кнопки рестарта - будет центрироваться по горизонтали
             btnRestart.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             btnRestart.Click += btnRestart_Click;
             this.Controls.Add(btnRestart);
 
             timerGame = new Timer();
-            timerGame.Interval = NormalSpeed; // Начинаем с обычной скорости
+            timerGame.Interval = NormalSpeed;
             timerGame.Tick += timerGame_Tick;
 
             btnFeed.Click += btnFeed_Click;
             btnClean.Click += btnClean_Click;
             btnPlay.Click += btnPlay_Click;
             btnSleep.Click += btnSleep_Click;
+            btnHeal.Click += btnHeal_Click;
 
             // Обработчики для кнопок скорости
             btnSpeedUp.Click += btnSpeedUp_Click;
@@ -142,7 +182,7 @@ namespace Тамагоча_свинья
             btnSpeedDown.Click += btnSpeedDown_Click;
 
             this.Load += MainForm_Load;
-            this.Resize += MainForm_Resize; // Добавляем обработчик изменения размера
+            this.Resize += MainForm_Resize;
         }
 
         private Label CreateLabel(string text, int y)
@@ -152,7 +192,6 @@ namespace Тамагоча_свинья
             label.Size = new Size(400, 20);
             label.Text = text;
             label.Font = new Font("Arial", 10);
-            // Настраиваем Anchor для меток - будут растягиваться по ширине
             label.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(label);
             return label;
@@ -166,7 +205,6 @@ namespace Тамагоча_свинья
             pb.Minimum = 0;
             pb.Maximum = 100;
             pb.Value = 50;
-            // Настраиваю Anchor для прогресс-баров - будут растягиваться по ширине
             pb.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(pb);
             return pb;
@@ -180,7 +218,20 @@ namespace Тамагоча_свинья
             button.Text = text;
             button.Font = new Font("Arial", 9);
             button.BackColor = Color.LightGreen;
-            // Настраиваем Anchor для кнопок действий - будут сохранять позицию относительно левого и правого краев
+            button.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            this.Controls.Add(button);
+            return button;
+        }
+
+        private Button CreateHealButton(string text, int x, int y)
+        {
+            var button = new Button();
+            button.Location = new Point(x, y);
+            button.Size = new Size(200, 30);
+            button.Text = text;
+            button.Font = new Font("Arial", 9, FontStyle.Bold);
+            button.BackColor = Color.LightYellow;
+            button.ForeColor = Color.DarkOrange;
             button.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(button);
             return button;
@@ -195,35 +246,32 @@ namespace Тамагоча_свинья
             button.Font = new Font("Arial", 9, FontStyle.Bold);
             button.BackColor = color;
             button.ForeColor = Color.DarkBlue;
-            // Настраиваем Anchor для кнопок скорости
             button.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(button);
             return button;
         }
 
-        // НОВЫЙ МЕТОД: Обработчик изменения размера формы
         private void MainForm_Resize(object sender, EventArgs e)
         {
             UpdateControlsLayout();
         }
 
-        // НОВЫЙ МЕТОД: Обновление расположения элементов при изменении размера
         private void UpdateControlsLayout()
         {
             int formWidth = this.ClientSize.Width;
             int formHeight = this.ClientSize.Height;
 
-            // Обновляем размер и позицию PictureBox
             int picSize = Math.Min(200, formWidth - 100);
             picPet.Size = new Size(picSize, picSize);
             picPet.Location = new Point((formWidth - picSize) / 2, 20);
 
-            // Обновляем позицию и размер статуса
             lblStatus.Location = new Point(50, picPet.Bottom + 20);
             lblStatus.Size = new Size(formWidth - 100, 30);
 
-            // Обновляем позиции и размеры прогресс-баров и меток
-            int yPos = lblStatus.Bottom + 20;
+            lblDailyNeeds.Location = new Point(50, lblStatus.Bottom + 5);
+            lblDailyNeeds.Size = new Size(formWidth - 100, 40);
+
+            int yPos = lblDailyNeeds.Bottom + 10;
             int controlWidth = formWidth - 100;
 
             UpdateControlPosition(lblHunger, pbHunger, yPos, controlWidth);
@@ -238,20 +286,23 @@ namespace Тамагоча_свинья
             UpdateControlPosition(lblEnergy, pbEnergy, yPos, controlWidth);
             yPos += 50;
 
-            // Обновляем позиции кнопок действий
+            UpdateControlPosition(lblHealth, pbHealth, yPos, controlWidth);
+            yPos += 50;
+
             UpdateActionButtonsPosition(yPos, formWidth);
             yPos += 40;
 
-            // Обновляем позиции кнопок скорости
+            btnHeal.Location = new Point((formWidth - 200) / 2, yPos);
+            btnHeal.Size = new Size(Math.Min(200, formWidth - 100), 30);
+            yPos += 40;
+
             UpdateSpeedButtonsPosition(yPos, formWidth);
             yPos += 40;
 
-            // Обновляем позицию кнопки рестарта
             btnRestart.Location = new Point((formWidth - 200) / 2, yPos);
             btnRestart.Size = new Size(Math.Min(200, formWidth - 100), 35);
         }
 
-        // НОВЫЙ МЕТОД: Обновление позиций меток и прогресс-баров
         private void UpdateControlPosition(Label label, ProgressBar progressBar, int yPos, int width)
         {
             label.Location = new Point(50, yPos);
@@ -261,7 +312,6 @@ namespace Тамагоча_свинья
             progressBar.Size = new Size(width, 20);
         }
 
-        // НОВЫЙ МЕТОД: Обновление позиций кнопок действий
         private void UpdateActionButtonsPosition(int yPos, int formWidth)
         {
             int buttonWidth = (formWidth - 120) / 4;
@@ -283,7 +333,6 @@ namespace Тамагоча_свинья
             btnSleep.Size = new Size(buttonWidth, 30);
         }
 
-        // НОВЫЙ МЕТОД: Обновление позиций кнопок скорости
         private void UpdateSpeedButtonsPosition(int yPos, int formWidth)
         {
             int buttonWidth = (formWidth - 40) / 3;
@@ -305,7 +354,96 @@ namespace Тамагоча_свинья
         private void InitializeGame()
         {
             timerGame.Start();
+            UpdateDailyNeeds();
             UpdateStatus();
+        }
+
+        // Новый метод для обновления ежедневных потребностей
+        private void UpdateDailyNeeds()
+        {
+            // Сбрасываем счетчики каждый день
+            dailyFeedRequests = 0;
+            dailySleepRequests = 0;
+            dailyPlayRequests = 0;
+
+            // Купание - каждый второй день
+            if (dayCounter % 2 == 0)
+            {
+                dailyBathRequests = 0;
+                maxBathRequests = 1;
+            }
+            else
+            {
+                maxBathRequests = 0;
+            }
+
+            // Генерируем случайные потребности на день
+            Random rand = new Random();
+            maxFeedRequests = rand.Next(2, 4); // 2-3 раза поесть
+            maxSleepRequests = rand.Next(1, 3); // 1-2 раза поспать
+            maxPlayRequests = rand.Next(1, 3); // 1-2 раза поиграть
+
+            UpdateDailyNeedsDisplay();
+        }
+
+        // Отображение текущих потребностей
+        private void UpdateDailyNeedsDisplay()
+        {
+            string needsText = $"День {dayCounter}: ";
+            List<string> needs = new List<string>();
+
+            if (dailyFeedRequests < maxFeedRequests)
+                needs.Add($"еда ({dailyFeedRequests}/{maxFeedRequests})");
+            if (dailySleepRequests < maxSleepRequests)
+                needs.Add($"сон ({dailySleepRequests}/{maxSleepRequests})");
+            if (dailyPlayRequests < maxPlayRequests)
+                needs.Add($"игра ({dailyPlayRequests}/{maxPlayRequests})");
+            if (dailyBathRequests < maxBathRequests)
+                needs.Add($"купание ({dailyBathRequests}/{maxBathRequests})");
+
+            if (needs.Count > 0)
+            {
+                needsText += "Нужно: " + string.Join(", ", needs);
+            }
+            else
+            {
+                needsText += "Все потребности удовлетворены!";
+            }
+
+            lblDailyNeeds.Text = needsText;
+        }
+
+        // Проверка выполнения всех ежедневных потребностей
+        private void CheckDailyNeedsCompletion()
+        {
+            bool allNeedsMet = (dailyFeedRequests >= maxFeedRequests) &&
+                              (dailySleepRequests >= maxSleepRequests) &&
+                              (dailyPlayRequests >= maxPlayRequests) &&
+                              (dailyBathRequests >= maxBathRequests);
+
+            if (allNeedsMet)
+            {
+                // Бонус за выполнение всех потребностей
+                happiness = Math.Min(100, happiness + 15);
+                health = Math.Min(100, health + 10);
+                lblStatus.Text = "Отличный день! Все потребности удовлетворены!";
+                lblStatus.ForeColor = Color.Green;
+
+                // Если поросенок болен, увеличиваем счетчик дней болезни при смене дня
+                if (isSick)
+                {
+                    sickDays++;
+                }
+
+                // Переходим к следующему дню
+                dayCounter++;
+                UpdateDailyNeeds();
+
+                MessageBox.Show($"День {dayCounter - 1} завершен! Поросенок счастлив!\nНачинается день {dayCounter}.", "Новый день",
+                              MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                UpdateOverallStatus();
+            }
         }
 
         private void UpdateStatus()
@@ -314,32 +452,63 @@ namespace Тамагоча_свинья
             pbHappiness.Value = happiness;
             pbCleanliness.Value = cleanliness;
             pbEnergy.Value = energy;
+            pbHealth.Value = health;
 
             lblHunger.Text = $"Голод: {hunger}%";
             lblHappiness.Text = $"Счастье: {happiness}%";
             lblCleanliness.Text = $"Чистота: {cleanliness}%";
             lblEnergy.Text = $"Энергия: {energy}%";
+            lblHealth.Text = $"Здоровье: {health}%";
+
+            if (health > 70)
+                pbHealth.ForeColor = Color.Green;
+            else if (health > 30)
+                pbHealth.ForeColor = Color.Orange;
+            else
+                pbHealth.ForeColor = Color.Red;
 
             UpdateOverallStatus();
             UpdatePetImage();
+            CheckSickness();
         }
 
-      
+        private void CheckSickness()
+        {
+            // Поросенок заболевает, если чистота ниже 20% и не болеет
+            if (cleanliness <= 20 && !isSick && health > 0)
+            {
+                isSick = true;
+                sickDays = 1; // ИЗМЕНЕНИЕ: устанавливаем 1 день болезни сразу
+                lblStatus.Text = "Поросенок Визенау заболел от грязи!";
+                lblStatus.ForeColor = Color.Red;
+                MessageBox.Show("Поросенок Визенау заболел от грязи! Срочно лечите его!", "Болезнь",
+                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            // Обновляем видимость кнопки лечения
+            btnHeal.Visible = isSick;
+        }
+
         private void UpdateOverallStatus()
         {
-            if (hunger <= 20 || happiness <= 20 || cleanliness <= 20 || energy <= 20)
+            if (isSick)
             {
-                lblStatus.Text = "Поросенок Визенау грустит :(";
+                lblStatus.Text = $"Поросенок Визенау болен! ({sickDays} день)";
                 lblStatus.ForeColor = Color.Red;
             }
-            else if (hunger >= 80 && happiness >= 80 && cleanliness >= 80 && energy >= 80)
+            else if (hunger <= 20 || happiness <= 20 || energy <= 20 || health <= 30)
+            {
+                lblStatus.Text = "Поросенок Визенау грустит :(";
+                lblStatus.ForeColor = Color.OrangeRed;
+            }
+            else if (hunger >= 80 && happiness >= 80 && cleanliness >= 80 && energy >= 80 && health >= 80)
             {
                 lblStatus.Text = "Поросенок Визенау счастлив! :)";
                 lblStatus.ForeColor = Color.Green;
             }
             else
             {
-                lblStatus.Text = "Поросенок Визенау хорошо себя чуствует";
+                lblStatus.Text = "Поросенок Визенау хорошо себя чувствует";
                 lblStatus.ForeColor = Color.Blue;
             }
         }
@@ -350,27 +519,31 @@ namespace Тамагоча_свинья
             {
                 string imagePath = "";
 
-                if (energy <= 20)
+                if (isSick)
+                {
+                    imagePath = @"D:\Тамагочи на 14.09.2025\Поросенок Визенау Тамагочи на 14.09.2025\Поросенок Визенау Тамагочи на 14.09.2025\Pigs\PigSick.png";
+                }
+                else if (energy <= 20)
                 {
                     imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigSleep.png";
-                    lblStatus.Text = "Поросенок Визенау хочет спать!";
+                    if (!isSick) lblStatus.Text = "Поросенок Визенау хочет спать!";
                 }
                 else if (hunger <= 20)
                 {
                     imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigHungry.png";
-                    lblStatus.Text = "Поросенок Визенау голоден!";
+                    if (!isSick) lblStatus.Text = "Поросенок Визенау голоден!";
                 }
                 else if (cleanliness <= 20)
                 {
                     imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigFilthy.png";
-                    lblStatus.Text = "Поросенок Визенау грязный!";
+                    if (!isSick) lblStatus.Text = "Поросенок Визенау грязный!";
                 }
                 else if (happiness <= 20)
                 {
                     imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigSad.png";
-                    lblStatus.Text = "Поросенок Визенау грустит!";
+                    if (!isSick) lblStatus.Text = "Поросенок Визенау грустит!";
                 }
-                else if (hunger >= 80 && happiness >= 80 && cleanliness >= 80 && energy >= 80)
+                else if (hunger >= 80 && happiness >= 80 && cleanliness >= 80 && energy >= 80 && health >= 80)
                 {
                     imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigHappy.png";
                 }
@@ -382,6 +555,7 @@ namespace Тамагоча_свинья
                 if (System.IO.File.Exists(imagePath))
                 {
                     picPet.Image = Image.FromFile(imagePath);
+                    picPet.SizeMode = PictureBoxSizeMode.Zoom;
                 }
                 else
                 {
@@ -405,7 +579,8 @@ namespace Тамагоча_свинья
                     new Font("Arial", 12), Brushes.Black, new PointF(10, 80));
 
                 string state = "";
-                if (energy <= 20) state = "Сонный";
+                if (isSick) state = "Больной";
+                else if (energy <= 20) state = "Сонный";
                 else if (hunger <= 20) state = "Голодный";
                 else if (cleanliness <= 20) state = "Грязный";
                 else if (happiness <= 20) state = "Грустный";
@@ -420,6 +595,16 @@ namespace Тамагоча_свинья
         {
             hunger = Math.Min(100, hunger + 30);
             cleanliness = Math.Max(0, cleanliness - 10);
+
+            // Учитываем в ежедневных потребностях
+            if (dailyFeedRequests < maxFeedRequests)
+            {
+                dailyFeedRequests++;
+                happiness = Math.Min(100, happiness + 5); // Бонус за выполнение потребности
+            }
+
+            UpdateDailyNeedsDisplay();
+            CheckDailyNeedsCompletion();
             UpdateStatus();
         }
 
@@ -427,6 +612,16 @@ namespace Тамагоча_свинья
         {
             cleanliness = Math.Min(100, cleanliness + 40);
             happiness = Math.Max(0, happiness - 5);
+
+            // Учитываем в ежедневных потребностях (купание)
+            if (dailyBathRequests < maxBathRequests)
+            {
+                dailyBathRequests++;
+                happiness = Math.Min(100, happiness + 8); // Бонус за выполнение потребности
+            }
+
+            UpdateDailyNeedsDisplay();
+            CheckDailyNeedsCompletion();
             UpdateStatus();
         }
 
@@ -435,6 +630,16 @@ namespace Тамагоча_свинья
             happiness = Math.Min(100, happiness + 25);
             energy = Math.Max(0, energy - 20);
             hunger = Math.Max(0, hunger - 10);
+
+            // Учитываем в ежедневных потребностях
+            if (dailyPlayRequests < maxPlayRequests)
+            {
+                dailyPlayRequests++;
+                happiness = Math.Min(100, happiness + 5); // Дополнительный бонус
+            }
+
+            UpdateDailyNeedsDisplay();
+            CheckDailyNeedsCompletion();
             UpdateStatus();
         }
 
@@ -442,10 +647,55 @@ namespace Тамагоча_свинья
         {
             energy = Math.Min(100, energy + 40);
             hunger = Math.Max(0, hunger - 15);
+
+            // Сон помогает восстановить здоровье только если поросенок не болен
+            if (!isSick)
+            {
+                health = Math.Min(100, health + 5);
+            }
+
+            // Учитываем в ежедневных потребностях
+            if (dailySleepRequests < maxSleepRequests)
+            {
+                dailySleepRequests++;
+                health = Math.Min(100, health + 3); // Бонус за выполнение потребности
+            }
+
+            UpdateDailyNeedsDisplay();
+            CheckDailyNeedsCompletion();
             UpdateStatus();
         }
 
-        // Обработчики для кнопок управления скоростью
+        private void btnHeal_Click(object sender, EventArgs e)
+        {
+            if (isSick)
+            {
+                health = Math.Min(100, health + 40);
+                happiness = Math.Max(0, happiness - 10);
+                energy = Math.Max(0, energy - 15);
+
+                // Шанс выздоровления 70%
+                if (new Random().Next(100) < 70)
+                {
+                    isSick = false;
+                    sickDays = 0;
+                    lblStatus.Text = "Поросенок Визенау выздоровел!";
+                    lblStatus.ForeColor = Color.Green;
+                    MessageBox.Show("Поросенок Визенау успешно вылечен!", "Лечение",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    // ИЗМЕНЕНИЕ: при неудачном лечении НЕ сбрасываем счетчик дней болезни
+                    lblStatus.Text = "Лечение не помогло, поросенок все еще болен";
+                    lblStatus.ForeColor = Color.Orange;
+                    MessageBox.Show("Лечение не помогло, попробуйте еще раз!", "Лечение",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                UpdateStatus();
+            }
+        }
+
         private void btnSpeedUp_Click(object sender, EventArgs e)
         {
             timerGame.Interval = FastSpeed;
@@ -484,11 +734,25 @@ namespace Тамагоча_свинья
             happiness = 50;
             cleanliness = 50;
             energy = 50;
+            health = 100;
+            isSick = false;
+            sickDays = 0;
+
+            // Сбрасываем систему дней и потребностей
+            dayCounter = 1;
+            timerTickCounter = 0;
+            dailyFeedRequests = 0;
+            dailySleepRequests = 0;
+            dailyPlayRequests = 0;
+            dailyBathRequests = 0;
 
             btnRestart.Visible = false;
+            btnHeal.Visible = false;
             SetActionButtonsEnabled(true);
-            timerGame.Interval = NormalSpeed; // Возвращаем обычную скорость
+            timerGame.Interval = NormalSpeed;
             timerGame.Start();
+
+            UpdateDailyNeeds();
             UpdateStatus();
 
             MessageBox.Show("У вас появился новый поросенок Визенау! Заботьтесь о нем лучше!", "Новая жизнь",
@@ -501,8 +765,8 @@ namespace Тамагоча_свинья
             btnClean.Enabled = enabled;
             btnPlay.Enabled = enabled;
             btnSleep.Enabled = enabled;
+            btnHeal.Enabled = enabled;
 
-            // Также включаем/выключаем кнопки скорости
             btnSpeedUp.Enabled = enabled;
             btnNormalSpeed.Enabled = enabled;
             btnSpeedDown.Enabled = enabled;
@@ -510,28 +774,99 @@ namespace Тамагоча_свинья
 
         private void timerGame_Tick(object sender, EventArgs e)
         {
+            timerTickCounter++;
+
+            if (timerTickCounter >= TicksPerDay)
+            {
+                timerTickCounter = 0;
+
+                if (isSick)
+                {
+                    sickDays++;
+
+                    UpdateOverallStatus();
+
+                    if (sickDays >= 5)
+                    {
+                        int deathChance = (sickDays - 4) * 15;
+                        if (new Random().Next(100) < deathChance && health <= 20)
+                        {
+                            timerGame.Stop();
+                            SetActionButtonsEnabled(false);
+                            btnRestart.Visible = true;
+                            MessageBox.Show($"Поросенок Визенау умер от болезни после {sickDays} дней болезни! Надо было лечить его вовремя!",
+                                          "Смерть", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
+                }
+
+                // Если не все потребности выполнены - штраф
+                if (!AreAllNeedsMet())
+                {
+                    happiness = Math.Max(0, happiness - 20);
+                    health = Math.Max(0, health - 10);
+                    lblStatus.Text = "Поросенок расстроен - не все потребности выполнены!";
+                    lblStatus.ForeColor = Color.OrangeRed;
+                    MessageBox.Show($"День {dayCounter} завершен. Не все потребности были удовлетворены!\nПоросенок расстроен.", "Неполный день",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
+                dayCounter++;
+                UpdateDailyNeeds();
+            }
+
             hunger = Math.Max(0, hunger - 5);
             happiness = Math.Max(0, happiness - 3);
             cleanliness = Math.Max(0, cleanliness - 4);
             energy = Math.Max(0, energy - 2);
 
+            // Если поросенок болен, здоровье ухудшается каждый тик
+            if (isSick)
+            {
+                health = Math.Max(0, health - 8);
+            }
+            else
+            {
+                // Медленное естественное восстановление здоровья, если не болен
+                if (cleanliness > 50 && happiness > 50)
+                {
+                    health = Math.Min(100, health + 2);
+                }
+            }
+
             UpdateStatus();
 
-            if (hunger == 0 || happiness == 0 || cleanliness == 0 || energy == 0)
+            // Условия смерти
+            if (hunger == 0 || happiness == 0 || energy == 0 || health == 0)
             {
                 timerGame.Stop();
                 SetActionButtonsEnabled(false);
                 btnRestart.Visible = true;
 
-                MessageBox.Show("Поросенок Визенау пошел на шаурму! Надо было о нем заботится лучше!",
+                string deathReason = "";
+                if (hunger == 0) deathReason = "голода";
+                else if (happiness == 0) deathReason = "тоски";
+                else if (energy == 0) deathReason = "истощения";
+                else if (health == 0) deathReason = "болезни";
+
+                MessageBox.Show($"Поросенок Визенау умер от {deathReason}! Надо было о нем заботится лучше!",
                               "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+        }
+
+        // Проверка выполнения всех потребностей
+        private bool AreAllNeedsMet()
+        {
+            return (dailyFeedRequests >= maxFeedRequests) &&
+                   (dailySleepRequests >= maxSleepRequests) &&
+                   (dailyPlayRequests >= maxPlayRequests) &&
+                   (dailyBathRequests >= maxBathRequests);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             UpdatePetImage();
-            // Вызываем обновление layout при загрузке формы
             UpdateControlsLayout();
         }
     }
