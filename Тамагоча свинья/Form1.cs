@@ -136,7 +136,7 @@ namespace Тамагоча_свинья
             yPos += 50;
 
             btnFeed = CreateButton("Покормить", 50, yPos);
-            btnClean = CreateButton("Убрать", 150, yPos);
+            btnClean = CreateButton("Почистить", 150, yPos);
             btnPlay = CreateButton("Поиграть", 250, yPos);
             btnSleep = CreateButton("Уложить спать", 350, yPos);
 
@@ -513,6 +513,7 @@ namespace Тамагоча_свинья
             }
         }
 
+
         private void UpdatePetImage()
         {
             try
@@ -521,7 +522,7 @@ namespace Тамагоча_свинья
 
                 if (isSick)
                 {
-                    imagePath = @"D:\Тамагочи на 14.09.2025\Поросенок Визенау Тамагочи на 14.09.2025\Поросенок Визенау Тамагочи на 14.09.2025\Pigs\PigSick.png";
+                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigSick.png";
                 }
                 else if (energy <= 20)
                 {
@@ -627,20 +628,27 @@ namespace Тамагоча_свинья
 
         private void btnPlay_Click(object sender, EventArgs e)
         {
-            happiness = Math.Min(100, happiness + 25);
-            energy = Math.Max(0, energy - 20);
-            hunger = Math.Max(0, hunger - 10);
-
-            // Учитываем в ежедневных потребностях
-            if (dailyPlayRequests < maxPlayRequests)
+            if (energy >= 20) // Проверяем, достаточно ли энергии для игры
             {
-                dailyPlayRequests++;
-                happiness = Math.Min(100, happiness + 5); // Дополнительный бонус
-            }
+                happiness = Math.Min(100, happiness + 25);
+                energy = Math.Max(0, energy - 20);
+                hunger = Math.Max(0, hunger - 10);
 
-            UpdateDailyNeedsDisplay();
-            CheckDailyNeedsCompletion();
-            UpdateStatus();
+                if (dailyPlayRequests < maxPlayRequests)
+                {
+                    dailyPlayRequests++;
+                    happiness = Math.Min(100, happiness + 5);
+                }
+
+                UpdateDailyNeedsDisplay();
+                CheckDailyNeedsCompletion();
+                UpdateStatus();
+            }
+            else
+            {
+                MessageBox.Show("Поросенок слишком устал для игр!", "Усталость",
+                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void btnSleep_Click(object sender, EventArgs e)
