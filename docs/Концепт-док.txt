@@ -15,7 +15,7 @@ ________________________________________________________________________________
 
 2.2 Основные характеристики питомца
 
-private int hunger = 50;        // Голод (0-100%)
+private int hunger = 50;        // Голод (0-100%)  
 private int happiness = 50;     // Счастье (0-100%)
 private int cleanliness = 50;   // Чистота (0-100%)
 private int energy = 50;        // Энергия (0-100%)
@@ -82,19 +82,19 @@ ________________________________________________________________________________
 6.1 Состояния поросенка
 Приложение отображает 7 различных состояний через изображения:
 
-Обычный - нормальное состояние
+Обычный - нормальное состояние https://www.google.com/url?sa=i&url=https%3A%2F%2Fanimals.pibig.info%2F11823-vetnamskaja-svinka.html&psig=AOvVaw0D_nuhpOn_XDiHsFYHa6hy&ust=1763110427566000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCIDI-qjg7pADFQAAAAAdAAAAABAE
 
-Больной - при болезни
+Больной - при болезни https://www.google.com/url?sa=i&url=https%3A%2F%2Fagrarii.com%2Fbolezni-vetnamskih-sviney%2F&psig=AOvVaw2S0so3klDC7rf-GVdcPhm4&ust=1763110458486000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLCnrLbg7pADFQAAAAAdAAAAABAL
 
-Сонный - энергия ≤ 20%
+Сонный - энергия ≤ 20% https://www.google.com/url?sa=i&url=https%3A%2F%2Fru.dreamstime.com%2Fphotos-images%2F%25D1%2581%25D0%25B2%25D0%25B8%25D0%25BD%25D1%258C%25D1%258F-%25D1%2581%25D0%25BF%25D0%25B8%25D1%2582.html&psig=AOvVaw0KfEojhk09EY9hQw9Elsdm&ust=1763110500955000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOiO98zg7pADFQAAAAAdAAAAABAE
 
-Голодный - голод ≤ 20%
+Голодный - голод ≤ 20%  https://www.google.com/search?q=%D1%81%D0%B2%D0%B8%D0%BD%D1%8C%D1%8F+%D0%92%D0%B8%D0%B7%D0%B5%D0%BD%D0%B0%D1%83+%D0%B3%D0%BE%D0%BB%D0%BE%D0%B4%D0%BD%D0%B0%D1%8F&sca_esv=9577114bb99f1b9e&udm=2&biw=1920&bih=919&sxsrf=AE3TifNqQ3GtvclwMtNtJN4b8UqOwYgaFA%3A1763024128889&ei=AJ0Vaa-GNoHY5NoPvfzdsAQ&ved=0ahUKEwivhrvX4O6QAxUBLFkFHT1-F0YQ4dUDCBI&uact=5&oq=%D1%81%D0%B2%D0%B8%D0%BD%D1%8C%D1%8F+%D0%92%D0%B8%D0%B7%D0%B5%D0%BD%D0%B0%D1%83+%D0%B3%D0%BE%D0%BB%D0%BE%D0%B4%D0%BD%D0%B0%D1%8F&gs_lp=Egtnd3Mtd2l6LWltZyIs0YHQstC40L3RjNGPINCS0LjQt9C10L3QsNGDINCz0L7Qu9C-0LTQvdCw0Y9I-xZQtAVYpBVwAXgAkAEAmAG2AaABugiqAQMwLja4AQPIAQD4AQGYAgOgAqIEwgIHECMYJxjJApgDAIgGAZIHAzAuM6AHnwqyBwMwLjO4B6IEwgcDMC4zyAcE&sclient=gws-wiz-img#vhid=FrCN3D6w6hBOzM&vssid=mosaic
 
-Грязный - чистота ≤ 20%
+Грязный - чистота ≤ 20% https://www.google.com/search?q=%D1%81%D0%B2%D0%B8%D0%BD%D1%8C%D1%8F+%D0%92%D0%B8%D0%B7%D0%B5%D0%BD%D0%B0%D1%83+%D0%B3%D1%80%D1%8F%D0%B7%D0%BD%D1%8B%D0%B9&sca_esv=9577114bb99f1b9e&udm=2&biw=1920&bih=919&sxsrf=AE3TifN6CuKpezwX84bEQFin75RfbGxznw%3A1763024178134&ei=Mp0Vafz6B5LR5NoPwfTRqQQ&ved=0ahUKEwj82_ju4O6QAxWSKFkFHUF6NEUQ4dUDCBI&uact=5&oq=%D1%81%D0%B2%D0%B8%D0%BD%D1%8C%D1%8F+%D0%92%D0%B8%D0%B7%D0%B5%D0%BD%D0%B0%D1%83+%D0%B3%D1%80%D1%8F%D0%B7%D0%BD%D1%8B%D0%B9&gs_lp=Egtnd3Mtd2l6LWltZyIq0YHQstC40L3RjNGPINCS0LjQt9C10L3QsNGDINCz0YDRj9C30L3Ri9C5SModUMMFWIQccAJ4AJABAJgBwgGgAdESqgEEMC4xM7gBA8gBAPgBAZgCBKACpgTCAgcQIxgnGMkCmAMAiAYBkgcDMS4zoAfuJ7IHAzAuM7gHpATCBwMwLjTIBwc&sclient=gws-wiz-img#vhid=6-pep8PryYW-IM&vssid=mosaic
 
-Грустный - счастье ≤ 20%
+Грустный - счастье ≤ 20% https://www.google.com/search?q=%D1%81%D0%B2%D0%B8%D0%BD%D1%8C%D1%8F+%D0%92%D0%B8%D0%B7%D0%B5%D0%BD%D0%B0%D1%83+%D0%B3%D1%80%D1%83%D1%81%D1%82%D0%BD%D1%8B%D0%B9&sca_esv=9577114bb99f1b9e&udm=2&biw=1920&bih=919&sxsrf=AE3TifNj-WJgOWtGPREIKs26jt36wWw_RQ%3A1763024201196&ei=SZ0VafrdC_2o5NoPhZOnqQQ&ved=0ahUKEwi6pvj54O6QAxV9FFkFHYXJKUUQ4dUDCBI&uact=5&oq=%D1%81%D0%B2%D0%B8%D0%BD%D1%8C%D1%8F+%D0%92%D0%B8%D0%B7%D0%B5%D0%BD%D0%B0%D1%83+%D0%B3%D1%80%D1%83%D1%81%D1%82%D0%BD%D1%8B%D0%B9&gs_lp=Egtnd3Mtd2l6LWltZyIs0YHQstC40L3RjNGPINCS0LjQt9C10L3QsNGDINCz0YDRg9GB0YLQvdGL0LlI6hRQ2wRYqxNwAXgAkAEAmAG2AaABsQ-qAQQwLjExuAEDyAEA-AEBmAICoALrAsICBxAjGCcYyQKYAwCIBgGSBwMwLjKgB44RsgcDMC4yuAfrAsIHAzAuMsgHAw&sclient=gws-wiz-img#vhid=jQIqU-FzQtYF9M&vssid=mosaic
 
-Счастливый - все параметры ≥ 80%
+Счастливый - все параметры ≥ 80%  https://www.google.com/search?q=%D1%81%D0%B2%D0%B8%D0%BD%D1%8C%D1%8F+%D0%92%D0%B8%D0%B7%D0%B5%D0%BD%D0%B0%D1%83+%D1%81%D1%87%D0%B0%D1%81%D1%82%D0%BB%D0%B8%D0%B2%D1%8B%D0%B9&sca_esv=9577114bb99f1b9e&udm=2&biw=1920&bih=919&sxsrf=AE3TifNBbvyOxlQnqPsP85d6CVBG3Pvjkg%3A1763024238949&ei=bp0VaZzZOeqf5NoPiJqWqQQ&ved=0ahUKEwicyPiL4e6QAxXqD1kFHQiNJUUQ4dUDCBI&uact=5&oq=%D1%81%D0%B2%D0%B8%D0%BD%D1%8C%D1%8F+%D0%92%D0%B8%D0%B7%D0%B5%D0%BD%D0%B0%D1%83+%D1%81%D1%87%D0%B0%D1%81%D1%82%D0%BB%D0%B8%D0%B2%D1%8B%D0%B9&gs_lp=Egtnd3Mtd2l6LWltZyIw0YHQstC40L3RjNGPINCS0LjQt9C10L3QsNGDINGB0YfQsNGB0YLQu9C40LLRi9C5SJshUJQHWOwfcAF4AJABAJgB7QGgAdkYqgEGMC4xNS4yuAEDyAEA-AEBmAIFoAKJB8ICBxAjGCcYyQKYAwCIBgGSBwMwLjWgB4wmsgcDMC41uAeJB8IHAzAuNcgHBw&sclient=gws-wiz-img#vhid=Kv1O2DwkDjBXMM&vssid=mosaic
 
 6.2 Интерфейс
 Progress Bars: Визуализация всех параметров
