@@ -74,6 +74,7 @@ namespace Тамагоча_свинья
         {
             InitializeCustomComponents();
             InitializeGame();
+
         }
 
         private void InitializeCustomComponents()
@@ -255,6 +256,8 @@ namespace Тамагоча_свинья
         {
             UpdateControlsLayout();
         }
+
+      
 
         private void UpdateControlsLayout()
         {
@@ -474,8 +477,8 @@ namespace Тамагоча_свинья
 
         private void CheckSickness()
         {
-            // Поросенок заболевает, если чистота ниже 20% и не болеет
-            if (cleanliness <= 20 && !isSick && health > 0)
+            // Поросенок заболевает, если чистота ниже или равна 10% и не болеет
+            if (cleanliness <= 10 && !isSick && health > 0)
             {
                 isSick = true;
                 sickDays = 1; // ИЗМЕНЕНИЕ: устанавливаем 1 день болезни сразу
@@ -508,54 +511,54 @@ namespace Тамагоча_свинья
             }
             else
             {
-                lblStatus.Text = "Поросенок Визенау хорошо себя чувствует";
+                lblStatus.Text = "Поросенок <<Визенау>> отдыхает";
                 lblStatus.ForeColor = Color.Blue;
             }
         }
-
 
         private void UpdatePetImage()
         {
             try
             {
-                string imagePath = "";
+                Image image = null;
 
                 if (isSick)
                 {
-                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigSick.png";
+                    image = Properties.Resources.PigSick1;
                 }
                 else if (energy <= 20)
                 {
-                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigSleep.png";
+                    image = Properties.Resources.PigSleep1;
                     if (!isSick) lblStatus.Text = "Поросенок Визенау хочет спать!";
                 }
                 else if (hunger <= 20)
                 {
-                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigHungry.png";
+                    image = Properties.Resources.PigHungry1;
                     if (!isSick) lblStatus.Text = "Поросенок Визенау голоден!";
                 }
-                else if (cleanliness <= 20)
+
+                else if (cleanliness <= 30)
                 {
-                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigFilthy.png";
+                    image = Properties.Resources.PigFlithy;
                     if (!isSick) lblStatus.Text = "Поросенок Визенау грязный!";
                 }
                 else if (happiness <= 20)
                 {
-                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigSad.png";
+                    image = Properties.Resources.PigSad1;
                     if (!isSick) lblStatus.Text = "Поросенок Визенау грустит!";
                 }
                 else if (hunger >= 80 && happiness >= 80 && cleanliness >= 80 && energy >= 80 && health >= 80)
                 {
-                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\PigHappy.png";
+                    image = Properties.Resources.PigHappy1;
                 }
                 else
                 {
-                    imagePath = @"C:\Users\User\Desktop\Tamagochi\Тамагоча свинья\PigsImage\Pig.png";
+                    image = Properties.Resources.Pig1;
                 }
 
-                if (System.IO.File.Exists(imagePath))
+                if (image != null)
                 {
-                    picPet.Image = Image.FromFile(imagePath);
+                    picPet.Image = image;
                     picPet.SizeMode = PictureBoxSizeMode.Zoom;
                 }
                 else
@@ -583,7 +586,7 @@ namespace Тамагоча_свинья
                 if (isSick) state = "Больной";
                 else if (energy <= 20) state = "Сонный";
                 else if (hunger <= 20) state = "Голодный";
-                else if (cleanliness <= 20) state = "Грязный";
+                else if (cleanliness <= 30) state = "Грязный"; // ИЗМЕНЕНИЕ: порог грязного состояния
                 else if (happiness <= 20) state = "Грустный";
                 else state = "Нормальный";
 
@@ -694,7 +697,7 @@ namespace Тамагоча_свинья
                 }
                 else
                 {
-                    // ИЗМЕНЕНИЕ: при неудачном лечении НЕ сбрасываем счетчик дней болезни
+
                     lblStatus.Text = "Лечение не помогло, поросенок все еще болен";
                     lblStatus.ForeColor = Color.Orange;
                     MessageBox.Show("Лечение не помогло, попробуйте еще раз!", "Лечение",
