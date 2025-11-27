@@ -126,5 +126,14 @@
   <ItemGroup>
     <None Include="PigsImage\PigHappy.jpg" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PigsImage\PigSleep1.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PigsImage\PigDied.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PigsImage\PigHungry %282%29.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -63,16 +63,6 @@ namespace Тамагоча_свинья.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pig {
-            get {
-                object obj = ResourceManager.GetObject("Pig", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap Pig1 {
             get {
                 object obj = ResourceManager.GetObject("Pig1", resourceCulture);
@@ -83,9 +73,9 @@ namespace Тамагоча_свинья.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PigFilthy {
+        internal static System.Drawing.Bitmap PigDead {
             get {
-                object obj = ResourceManager.GetObject("PigFilthy", resourceCulture);
+                object obj = ResourceManager.GetObject("PigDead", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,29 +93,9 @@ namespace Тамагоча_свинья.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PigHappy {
-            get {
-                object obj = ResourceManager.GetObject("PigHappy", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap PigHappy1 {
             get {
                 object obj = ResourceManager.GetObject("PigHappy1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap PigHungry {
-            get {
-                object obj = ResourceManager.GetObject("PigHungry", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -143,9 +113,9 @@ namespace Тамагоча_свинья.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PigSad {
+        internal static System.Drawing.Bitmap PigHungry2 {
             get {
-                object obj = ResourceManager.GetObject("PigSad", resourceCulture);
+                object obj = ResourceManager.GetObject("PigHungry2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -163,16 +133,6 @@ namespace Тамагоча_свинья.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PigSick {
-            get {
-                object obj = ResourceManager.GetObject("PigSick", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap PigSick1 {
             get {
                 object obj = ResourceManager.GetObject("PigSick1", resourceCulture);
@@ -183,9 +143,9 @@ namespace Тамагоча_свинья.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PigSleep {
+        internal static System.Drawing.Bitmap PigSleep1 {
             get {
-                object obj = ResourceManager.GetObject("PigSleep", resourceCulture);
+                object obj = ResourceManager.GetObject("PigSleep1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -193,9 +153,9 @@ namespace Тамагоча_свинья.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PigSleep1 {
+        internal static System.Drawing.Bitmap PigSleep11 {
             get {
-                object obj = ResourceManager.GetObject("PigSleep1", resourceCulture);
+                object obj = ResourceManager.GetObject("PigSleep11", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

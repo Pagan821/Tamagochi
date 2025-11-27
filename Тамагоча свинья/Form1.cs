@@ -19,6 +19,7 @@ namespace Тамагоча_свинья
         private int health = 100;
         private bool isSick = false;
         private int sickDays = 0;
+        private bool isDead = false; // Новое поле для отслеживания смерти
 
         // Система ежедневных потребностей
         private int dayCounter = 1;
@@ -35,13 +36,18 @@ namespace Тамагоча_свинья
         private int timerTickCounter = 0;
         private const int TicksPerDay = 15; // Каждые 15 тиков = 1 день
 
+        // Для системы сна
+        private bool isSleeping = false;
+        private Timer sleepTimer;
+        private int sleepDuration = 4000; // сон
+
         private Label lblStatus;
         private Label lblHunger;
         private Label lblHappiness;
         private Label lblCleanliness;
         private Label lblEnergy;
         private Label lblHealth;
-        private Label lblDailyNeeds; // Новый лейбл для отображения потребностей
+        private Label lblDailyNeeds;
         private ProgressBar pbHunger;
         private ProgressBar pbHappiness;
         private ProgressBar pbCleanliness;
@@ -74,7 +80,6 @@ namespace Тамагоча_свинья
         {
             InitializeCustomComponents();
             InitializeGame();
-
         }
 
         private void InitializeCustomComponents()
@@ -86,25 +91,27 @@ namespace Тамагоча_свинья
             this.MinimumSize = new Size(500, 700);
 
             picPet = new PictureBox();
-            picPet.Size = new Size(200, 200);
-            picPet.Location = new Point(150, 20);
+            picPet.Size = new Size(250, 250); 
+            picPet.Location = new Point(125, 20);
             picPet.BorderStyle = BorderStyle.FixedSingle;
             picPet.BackColor = Color.White;
             picPet.SizeMode = PictureBoxSizeMode.Zoom;
             picPet.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            picPet.BorderStyle = BorderStyle.Fixed3D;
             this.Controls.Add(picPet);
 
             lblStatus = new Label();
-            lblStatus.Location = new Point(50, 240);
+            lblStatus.Location = new Point(50, 280); 
             lblStatus.Size = new Size(400, 30);
             lblStatus.Font = new Font("Arial", 14, FontStyle.Bold);
             lblStatus.TextAlign = ContentAlignment.MiddleCenter;
             lblStatus.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(lblStatus);
 
-            // Лейбл для ежедневных потребностей
+
             lblDailyNeeds = new Label();
-            lblDailyNeeds.Location = new Point(50, 275);
+            lblDailyNeeds.Location = new Point(50, 315); 
             lblDailyNeeds.Size = new Size(400, 40);
             lblDailyNeeds.Font = new Font("Arial", 9, FontStyle.Italic);
             lblDailyNeeds.TextAlign = ContentAlignment.MiddleCenter;
@@ -112,7 +119,7 @@ namespace Тамагоча_свинья
             lblDailyNeeds.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(lblDailyNeeds);
 
-            int yPos = 320;
+            int yPos = 360;
 
             lblHunger = CreateLabel("Голод: 50%", yPos);
             pbHunger = CreateProgressBar(yPos + 25);
@@ -129,7 +136,7 @@ namespace Тамагоча_свинья
             lblEnergy = CreateLabel("Энергия: 50%", yPos);
             pbEnergy = CreateProgressBar(yPos + 25);
             yPos += 50;
-
+            
             // Добавляем здоровье
             lblHealth = CreateLabel("Здоровье: 100%", yPos);
             pbHealth = CreateProgressBar(yPos + 25);
@@ -167,9 +174,15 @@ namespace Тамагоча_свинья
             btnRestart.Click += btnRestart_Click;
             this.Controls.Add(btnRestart);
 
+            // Основной таймер игры
             timerGame = new Timer();
             timerGame.Interval = NormalSpeed;
             timerGame.Tick += timerGame_Tick;
+
+            // Таймер для сна
+            sleepTimer = new Timer();
+            sleepTimer.Interval = sleepDuration;
+            sleepTimer.Tick += sleepTimer_Tick;
 
             btnFeed.Click += btnFeed_Click;
             btnClean.Click += btnClean_Click;
@@ -257,16 +270,32 @@ namespace Тамагоча_свинья
             UpdateControlsLayout();
         }
 
-      
-
         private void UpdateControlsLayout()
         {
             int formWidth = this.ClientSize.Width;
             int formHeight = this.ClientSize.Height;
 
-            int picSize = Math.Min(200, formWidth - 100);
+            int picSize = Math.Min(250, formWidth - 100); 
             picPet.Size = new Size(picSize, picSize);
             picPet.Location = new Point((formWidth - picSize) / 2, 20);
+
+            if (!isDead)
+            {
+                if (isSleeping)
+                    picPet.BackColor = Color.LightBlue;
+                else if (isSick)
+                    picPet.BackColor = Color.LightYellow;
+                else if (happiness >= 80 && hunger >= 80 && energy >= 80)
+                    picPet.BackColor = Color.LightGreen;
+                else if (happiness <= 20 || hunger <= 20 || energy <= 20)
+                    picPet.BackColor = Color.LightPink;
+                else
+                    picPet.BackColor = Color.White;
+            }
+            else
+            {
+                picPet.BackColor = Color.LightGray;
+            }
 
             lblStatus.Location = new Point(50, picPet.Bottom + 20);
             lblStatus.Size = new Size(formWidth - 100, 30);
@@ -432,7 +461,7 @@ namespace Тамагоча_свинья
                 lblStatus.Text = "Отличный день! Все потребности удовлетворены!";
                 lblStatus.ForeColor = Color.Green;
 
-                // Если поросенок болен, увеличиваем счетчик дней болезни при смене дня
+
                 if (isSick)
                 {
                     sickDays++;
@@ -478,10 +507,10 @@ namespace Тамагоча_свинья
         private void CheckSickness()
         {
             // Поросенок заболевает, если чистота ниже или равна 10% и не болеет
-            if (cleanliness <= 10 && !isSick && health > 0)
+            if (cleanliness <= 10 && !isSick && health > 0 && !isDead)
             {
                 isSick = true;
-                sickDays = 1; // ИЗМЕНЕНИЕ: устанавливаем 1 день болезни сразу
+                sickDays = 1; // устанавливаем 1 день болезни сразу
                 lblStatus.Text = "Поросенок Визенау заболел от грязи!";
                 lblStatus.ForeColor = Color.Red;
                 MessageBox.Show("Поросенок Визенау заболел от грязи! Срочно лечите его!", "Болезнь",
@@ -489,12 +518,22 @@ namespace Тамагоча_свинья
             }
 
             // Обновляем видимость кнопки лечения
-            btnHeal.Visible = isSick;
+            btnHeal.Visible = isSick && !isDead;
         }
 
         private void UpdateOverallStatus()
         {
-            if (isSick)
+            if (isDead)
+            {
+                lblStatus.Text = "Поросенок Визенау умер... RIP";
+                lblStatus.ForeColor = Color.DarkRed;
+            }
+            else if (isSleeping)
+            {
+                lblStatus.Text = "Поросенок Визенау крепко спит... zZz";
+                lblStatus.ForeColor = Color.DarkBlue;
+            }
+            else if (isSick)
             {
                 lblStatus.Text = $"Поросенок Визенау болен! ({sickDays} день)";
                 lblStatus.ForeColor = Color.Red;
@@ -522,44 +561,62 @@ namespace Тамагоча_свинья
             {
                 Image image = null;
 
-                if (isSick)
+                if (isDead)
+                {
+                    image = Properties.Resources.PigDead;
+                    picPet.BackColor = Color.DarkGray;
+                }
+                else if (isSleeping)
+                {
+                    image = Properties.Resources.PigSleep1;
+                    picPet.BackColor = Color.LightBlue; // Голубой фон для сна
+                }
+                else if (isSick)
                 {
                     image = Properties.Resources.PigSick1;
+                    picPet.BackColor = Color.LightYellow; // Желтый фон для болезни
                 }
                 else if (energy <= 20)
                 {
-                    image = Properties.Resources.PigSleep1;
+                    image = Properties.Resources.PigSleep11;
+                    picPet.BackColor = Color.LightCyan; // Бледно-голубой для усталости
                     if (!isSick) lblStatus.Text = "Поросенок Визенау хочет спать!";
                 }
                 else if (hunger <= 20)
                 {
-                    image = Properties.Resources.PigHungry1;
+                    image = Properties.Resources.PigHungry2;
+                    picPet.BackColor = Color.LightSalmon; // Розовый для голода
                     if (!isSick) lblStatus.Text = "Поросенок Визенау голоден!";
                 }
-
                 else if (cleanliness <= 30)
                 {
                     image = Properties.Resources.PigFlithy;
+                    picPet.BackColor = Color.LightSlateGray; // Серый для грязного
                     if (!isSick) lblStatus.Text = "Поросенок Визенау грязный!";
                 }
                 else if (happiness <= 20)
                 {
                     image = Properties.Resources.PigSad1;
+                    picPet.BackColor = Color.LightSteelBlue; // Голубоватый для грусти
                     if (!isSick) lblStatus.Text = "Поросенок Визенау грустит!";
                 }
                 else if (hunger >= 80 && happiness >= 80 && cleanliness >= 80 && energy >= 80 && health >= 80)
                 {
                     image = Properties.Resources.PigHappy1;
+                    picPet.BackColor = Color.LightGreen; // Зеленый для счастья
                 }
                 else
                 {
                     image = Properties.Resources.Pig1;
+                    picPet.BackColor = Color.White; // Белый для нормального состояния
                 }
 
                 if (image != null)
                 {
                     picPet.Image = image;
                     picPet.SizeMode = PictureBoxSizeMode.Zoom;
+
+                    picPet.BorderStyle = BorderStyle.Fixed3D;
                 }
                 else
                 {
@@ -573,30 +630,71 @@ namespace Тамагоча_свинья
             }
         }
 
+
         private void ShowDefaultImage()
         {
-            picPet.BackColor = Color.Pink;
+            Color backgroundColor = isDead ? Color.DarkGray :
+                                  isSleeping ? Color.LightBlue :
+                                  isSick ? Color.LightYellow :
+                                  Color.White;
+
+            picPet.BackColor = backgroundColor;
+            picPet.BorderStyle = BorderStyle.Fixed3D;
+
             using (Graphics g = picPet.CreateGraphics())
             {
-                g.Clear(Color.Pink);
-                g.DrawString("Поросенок Визенау",
-                    new Font("Arial", 12), Brushes.Black, new PointF(10, 80));
+                g.Clear(backgroundColor);
 
-                string state = "";
-                if (isSick) state = "Больной";
-                else if (energy <= 20) state = "Сонный";
-                else if (hunger <= 20) state = "Голодный";
-                else if (cleanliness <= 30) state = "Грязный"; // ИЗМЕНЕНИЕ: порог грязного состояния
-                else if (happiness <= 20) state = "Грустный";
-                else state = "Нормальный";
+                using (Font titleFont = new Font("Arial", 14, FontStyle.Bold))
+                using (Font stateFont = new Font("Arial", 11, FontStyle.Regular))
+                using (Brush textBrush = new SolidBrush(Color.DarkBlue))
+                {
+                    g.DrawString("Поросенок Визенау", titleFont, textBrush, new PointF(20, 80));
 
-                g.DrawString($"Состояние: {state}",
-                    new Font("Arial", 10), Brushes.Black, new PointF(10, 110));
+                    string state = "";
+                    if (isDead) state = "Мертвый";
+                    else if (isSleeping) state = "Спит";
+                    else if (isSick) state = "Больной";
+                    else if (energy <= 20) state = "Сонный";
+                    else if (hunger <= 20) state = "Голодный";
+                    else if (cleanliness <= 30) state = "Грязный";
+                    else if (happiness <= 20) state = "Грустный";
+                    else state = "Нормальный";
+
+                    g.DrawString($"Состояние: {state}", stateFont, textBrush, new PointF(20, 110));
+
+                    if (!isDead)
+                    {
+                        g.DrawString($"День: {dayCounter}", stateFont, textBrush, new PointF(20, 135));
+                    }
+                }
             }
+        }
+
+        // Новый метод для обработки смерти поросенка
+        private void HandleDeath(string deathReason)
+        {
+            isDead = true;
+            timerGame.Stop();
+            sleepTimer.Stop();
+            SetActionButtonsEnabled(false);
+            btnRestart.Visible = true;
+
+            // Обновляем статус и изображение
+            UpdateStatus();
+
+            string message = $"Поросенок Визенау умер от {deathReason}!\n";
+            message += "Надо было о нем заботится лучше!\n\n";
+            message += "Нажмите кнопку 'Завести нового поросенка', чтобы начать заново.";
+
+            MessageBox.Show(message, "Смерть поросенка",
+                          MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void btnFeed_Click(object sender, EventArgs e)
         {
+            if (isSleeping || isDead) return;
+
             hunger = Math.Min(100, hunger + 30);
             cleanliness = Math.Max(0, cleanliness - 10);
 
@@ -614,6 +712,8 @@ namespace Тамагоча_свинья
 
         private void btnClean_Click(object sender, EventArgs e)
         {
+            if (isSleeping || isDead) return;
+
             cleanliness = Math.Min(100, cleanliness + 40);
             happiness = Math.Max(0, happiness - 5);
 
@@ -631,6 +731,8 @@ namespace Тамагоча_свинья
 
         private void btnPlay_Click(object sender, EventArgs e)
         {
+            if (isSleeping || isDead) return;
+
             if (energy >= 20) // Проверяем, достаточно ли энергии для игры
             {
                 happiness = Math.Min(100, happiness + 25);
@@ -656,14 +758,24 @@ namespace Тамагоча_свинья
 
         private void btnSleep_Click(object sender, EventArgs e)
         {
-            energy = Math.Min(100, energy + 40);
-            hunger = Math.Max(0, hunger - 15);
+            if (isSleeping || isDead) return;
 
-            // Сон помогает восстановить здоровье только если поросенок не болен
-            if (!isSick)
-            {
-                health = Math.Min(100, health + 5);
-            }
+            StartSleeping();
+        }
+
+        // Новый метод для начала сна
+        private void StartSleeping()
+        {
+            isSleeping = true;
+
+            // Останавливаем основной таймер игры
+            timerGame.Stop();
+
+            // Отключаем все кнопки действий
+            SetActionButtonsEnabled(false);
+
+            // Обновляем статус и изображение
+            UpdateStatus();
 
             // Учитываем в ежедневных потребностях
             if (dailySleepRequests < maxSleepRequests)
@@ -673,12 +785,50 @@ namespace Тамагоча_свинья
             }
 
             UpdateDailyNeedsDisplay();
-            CheckDailyNeedsCompletion();
+
+            // Запускаем таймер сна
+            sleepTimer.Start();
+
+            MessageBox.Show("Поросенок Визенау засыпает... zZz\nИгра временно приостановлена.", "Сон",
+                          MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+    
+        private void sleepTimer_Tick(object sender, EventArgs e)
+        {
+            sleepTimer.Stop();
+            isSleeping = false;
+
+            // Восстанавливаем энергию и немного здоровье
+            energy = Math.Min(100, energy + 40);
+            hunger = Math.Max(0, hunger - 15);
+
+            if (!isSick)
+            {
+                health = Math.Min(100, health + 5);
+            }
+
+            SetActionButtonsEnabled(true);
+            timerGame.Start();
             UpdateStatus();
+            CheckDailyNeedsCompletion();
+
+            if (isSick)
+            {
+                MessageBox.Show("Поросенок Визенау проснулся, но чувствует себя плохо...", "Пробуждение",
+                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                MessageBox.Show("Поросенок Визенау проснулся отдохнувшим и полным сил!", "Пробуждение",
+                              MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void btnHeal_Click(object sender, EventArgs e)
         {
+            if (isSleeping || isDead) return;
+
             if (isSick)
             {
                 health = Math.Min(100, health + 40);
@@ -697,7 +847,6 @@ namespace Тамагоча_свинья
                 }
                 else
                 {
-
                     lblStatus.Text = "Лечение не помогло, поросенок все еще болен";
                     lblStatus.ForeColor = Color.Orange;
                     MessageBox.Show("Лечение не помогло, попробуйте еще раз!", "Лечение",
@@ -709,6 +858,8 @@ namespace Тамагоча_свинья
 
         private void btnSpeedUp_Click(object sender, EventArgs e)
         {
+            if (isSleeping || isDead) return;
+
             timerGame.Interval = FastSpeed;
             lblStatus.Text = "Скорость игры: Ускоренная";
             lblStatus.ForeColor = Color.OrangeRed;
@@ -718,6 +869,8 @@ namespace Тамагоча_свинья
 
         private void btnNormalSpeed_Click(object sender, EventArgs e)
         {
+            if (isSleeping || isDead) return;
+
             timerGame.Interval = NormalSpeed;
             lblStatus.Text = "Скорость игры: Обычная";
             lblStatus.ForeColor = Color.Blue;
@@ -727,6 +880,8 @@ namespace Тамагоча_свинья
 
         private void btnSpeedDown_Click(object sender, EventArgs e)
         {
+            if (isSleeping || isDead) return;
+
             timerGame.Interval = SlowSpeed;
             lblStatus.Text = "Скорость игры: Замедленная";
             lblStatus.ForeColor = Color.DarkGreen;
@@ -741,6 +896,10 @@ namespace Тамагоча_свинья
 
         private void RestartGame()
         {
+            // Останавливаем все таймеры
+            timerGame.Stop();
+            sleepTimer.Stop();
+
             hunger = 50;
             happiness = 50;
             cleanliness = 50;
@@ -748,6 +907,8 @@ namespace Тамагоча_свинья
             health = 100;
             isSick = false;
             sickDays = 0;
+            isSleeping = false;
+            isDead = false; // Сбрасываем состояние смерти
 
             // Сбрасываем систему дней и потребностей
             dayCounter = 1;
@@ -772,19 +933,22 @@ namespace Тамагоча_свинья
 
         private void SetActionButtonsEnabled(bool enabled)
         {
-            btnFeed.Enabled = enabled;
-            btnClean.Enabled = enabled;
-            btnPlay.Enabled = enabled;
-            btnSleep.Enabled = enabled;
-            btnHeal.Enabled = enabled;
+            btnFeed.Enabled = enabled && !isDead;
+            btnClean.Enabled = enabled && !isDead;
+            btnPlay.Enabled = enabled && !isDead;
+            btnSleep.Enabled = enabled && !isDead;
+            btnHeal.Enabled = enabled && !isDead;
 
-            btnSpeedUp.Enabled = enabled;
-            btnNormalSpeed.Enabled = enabled;
-            btnSpeedDown.Enabled = enabled;
+            btnSpeedUp.Enabled = enabled && !isDead;
+            btnNormalSpeed.Enabled = enabled && !isDead;
+            btnSpeedDown.Enabled = enabled && !isDead;
         }
 
         private void timerGame_Tick(object sender, EventArgs e)
         {
+            // Если поросенок спит или мертв, не обновляем состояние
+            if (isSleeping || isDead) return;
+
             timerTickCounter++;
 
             if (timerTickCounter >= TicksPerDay)
@@ -802,11 +966,7 @@ namespace Тамагоча_свинья
                         int deathChance = (sickDays - 4) * 15;
                         if (new Random().Next(100) < deathChance && health <= 20)
                         {
-                            timerGame.Stop();
-                            SetActionButtonsEnabled(false);
-                            btnRestart.Visible = true;
-                            MessageBox.Show($"Поросенок Визенау умер от болезни после {sickDays} дней болезни! Надо было лечить его вовремя!",
-                                          "Смерть", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            HandleDeath($"болезни после {sickDays} дней болезни");
                             return;
                         }
                     }
@@ -839,7 +999,6 @@ namespace Тамагоча_свинья
             }
             else
             {
-                // Медленное естественное восстановление здоровья, если не болен
                 if (cleanliness > 50 && happiness > 50)
                 {
                     health = Math.Min(100, health + 2);
@@ -849,20 +1008,25 @@ namespace Тамагоча_свинья
             UpdateStatus();
 
             // Условия смерти
-            if (hunger == 0 || happiness == 0 || energy == 0 || health == 0)
+            if (hunger == 0)
             {
-                timerGame.Stop();
-                SetActionButtonsEnabled(false);
-                btnRestart.Visible = true;
-
-                string deathReason = "";
-                if (hunger == 0) deathReason = "голода";
-                else if (happiness == 0) deathReason = "тоски";
-                else if (energy == 0) deathReason = "истощения";
-                else if (health == 0) deathReason = "болезни";
-
-                MessageBox.Show($"Поросенок Визенау умер от {deathReason}! Надо было о нем заботится лучше!",
-                              "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                HandleDeath("голода");
+                return;
+            }
+            else if (happiness == 0)
+            {
+                HandleDeath("тоски");
+                return;
+            }
+            else if (energy == 0)
+            {
+                HandleDeath("истощения");
+                return;
+            }
+            else if (health == 0)
+            {
+                HandleDeath("болезни");
+                return;
             }
         }
 
