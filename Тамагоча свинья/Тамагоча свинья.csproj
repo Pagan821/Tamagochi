@@ -85,54 +85,54 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\Pig.jpg">
+    <Resource Include="PigsImage\Pig.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigHungry.jpg">
+    <Resource Include="PigsImage\PigHungry.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigSick.jpg">
+    <Resource Include="PigsImage\PigSick.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigSleep.jpg">
+    <Resource Include="PigsImage\PigSleep.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigFlithy.jpg">
+    <Resource Include="PigsImage\PigFlithy.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigSad.jpg">
+    <Resource Include="PigsImage\PigSad.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigHappy.jpg">
+    <Resource Include="PigsImage\PigHappy.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigSleep1.jpg">
+    <Resource Include="PigsImage\PigSleep1.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigDied.jpg">
+    <Resource Include="PigsImage\PigDied.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigHungry %282%29.jpg">
+    <Resource Include="PigsImage\PigHungry %282%29.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

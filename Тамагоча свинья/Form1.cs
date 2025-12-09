@@ -100,10 +100,10 @@ namespace Тамагоча_свинья
            
 
             lblStatus = new Label();
-            lblStatus.Location = new Point(500, 280); 
+            lblStatus.Location = new Point(450, 80); 
             lblStatus.Size = new Size(400, 30);
             lblStatus.Font = new Font("Arial", 14, FontStyle.Bold);
-            lblStatus.TextAlign = ContentAlignment.MiddleCenter;
+            //lblStatus.TextAlign = ContentAlignment.MiddleCenter;
             //lblStatus.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(lblStatus);
 
