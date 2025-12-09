@@ -63,8 +63,8 @@ namespace Тамагоча_свинья
         private Button btnSpeedDown;
 
         // Добавляем константы для первоначальных размеров
-        private const int OriginalWidth = 500;
-        private const int OriginalHeight = 750;
+        private const int OriginalWidth = 1280;
+        private const int OriginalHeight = 770;
 
         // Константы скоростей игры (интервалы в миллисекундах)
         private const int SlowSpeed = 10000;
@@ -85,23 +85,26 @@ namespace Тамагоча_свинья
             this.BackColor = Color.LightBlue;
             this.MinimumSize = new Size(500, 700);
 
-            picPet = new PictureBox();
-            picPet.Size = new Size(250, 250); 
-            picPet.Location = new Point(125, 20);
-            picPet.BorderStyle = BorderStyle.FixedSingle;
-            picPet.BackColor = Color.White;
-            picPet.SizeMode = PictureBoxSizeMode.Zoom;
-            picPet.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            //picPet = new PictureBox();
+            //picPet.Size = new Size(250, 250); 
+            //picPet.Location = new Point(125, 20);
+            //picPet.BorderStyle = BorderStyle.FixedSingle;
+            //picPet.BackColor = Color.White;
+            //picPet.SizeMode = PictureBoxSizeMode.Zoom;
+            //picPet.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
-            picPet.BorderStyle = BorderStyle.Fixed3D;
-            this.Controls.Add(picPet);
+            //picPet.BorderStyle = BorderStyle.Fixed3D;
+            //this.Controls.Add(picPet);
+
+            this.BackgroundImage = new Bitmap(OriginalWidth, OriginalHeight);
+           
 
             lblStatus = new Label();
-            lblStatus.Location = new Point(50, 280); 
+            lblStatus.Location = new Point(500, 280); 
             lblStatus.Size = new Size(400, 30);
             lblStatus.Font = new Font("Arial", 14, FontStyle.Bold);
             lblStatus.TextAlign = ContentAlignment.MiddleCenter;
-            lblStatus.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            //lblStatus.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(lblStatus);
 
 
@@ -109,9 +112,9 @@ namespace Тамагоча_свинья
             lblDailyNeeds.Location = new Point(50, 315); 
             lblDailyNeeds.Size = new Size(400, 40);
             lblDailyNeeds.Font = new Font("Arial", 9, FontStyle.Italic);
-            lblDailyNeeds.TextAlign = ContentAlignment.MiddleCenter;
+            //lblDailyNeeds.TextAlign = ContentAlignment.MiddleCenter;
             lblDailyNeeds.ForeColor = Color.DarkBlue;
-            lblDailyNeeds.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            //lblDailyNeeds.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.Controls.Add(lblDailyNeeds);
 
             int yPos = 360;
@@ -270,30 +273,30 @@ namespace Тамагоча_свинья
             int formWidth = this.ClientSize.Width;
             int formHeight = this.ClientSize.Height;
 
-            int picSize = Math.Min(250, formWidth - 100); 
-            picPet.Size = new Size(picSize, picSize);
-            picPet.Location = new Point((formWidth - picSize) / 2, 20);
+            //int picSize = Math.Min(250, formWidth - 100); 
+            //picPet.Size = new Size(picSize, picSize);
+            //picPet.Location = new Point((formWidth - picSize) / 2, 20);
 
-            if (!isDead)
-            {
-                if (isSleeping)
-                    picPet.BackColor = Color.LightBlue;
-                else if (isSick)
-                    picPet.BackColor = Color.LightYellow;
-                else if (happiness >= 80 && hunger >= 80 && energy >= 80)
-                    picPet.BackColor = Color.LightGreen;
-                else if (happiness <= 20 || hunger <= 20 || energy <= 20)
-                    picPet.BackColor = Color.LightPink;
-                else
-                    picPet.BackColor = Color.White;
-            }
-            else
-            {
-                picPet.BackColor = Color.LightGray;
-            }
+            //if (!isDead)
+            //{
+            //    if (isSleeping)
+            //        picPet.BackColor = Color.LightBlue;
+            //    else if (isSick)
+            //        picPet.BackColor = Color.LightYellow;
+            //    else if (happiness >= 80 && hunger >= 80 && energy >= 80)
+            //        picPet.BackColor = Color.LightGreen;
+            //    else if (happiness <= 20 || hunger <= 20 || energy <= 20)
+            //        picPet.BackColor = Color.LightPink;
+            //    else
+            //        picPet.BackColor = Color.White;
+            //}
+            //else
+            //{
+            //    picPet.BackColor = Color.LightGray;
+            //}
 
-            lblStatus.Location = new Point(50, picPet.Bottom + 20);
-            lblStatus.Size = new Size(formWidth - 100, 30);
+            //lblStatus.Location = new Point(50, picPet.Bottom + 20);
+            //lblStatus.Size = new Size(formWidth - 100, 30);
 
             lblDailyNeeds.Location = new Point(50, lblStatus.Bottom + 5);
             lblDailyNeeds.Size = new Size(formWidth - 100, 40);
@@ -333,10 +336,10 @@ namespace Тамагоча_свинья
         private void UpdateControlPosition(Label label, ProgressBar progressBar, int yPos, int width)
         {
             label.Location = new Point(50, yPos);
-            label.Size = new Size(width, 20);
+            label.Size = new Size(width / 5, 20);
 
             progressBar.Location = new Point(50, yPos + 25);
-            progressBar.Size = new Size(width, 20);
+            progressBar.Size = new Size(width / 5, 20);
         }
 
         private void UpdateActionButtonsPosition(int yPos, int formWidth)
@@ -365,7 +368,8 @@ namespace Тамагоча_свинья
             int buttonWidth = (formWidth - 40) / 3;
             buttonWidth = Math.Min(120, buttonWidth);
 
-            int totalWidth = buttonWidth * 3 + 20;
+            //int totalWidth = buttonWidth * 3 + 20;
+            int totalWidth = buttonWidth + 20;
             int startX = (formWidth - totalWidth) / 2;
 
             btnSpeedDown.Location = new Point(startX, yPos);
@@ -569,52 +573,61 @@ namespace Тамагоча_свинья
 
                 if (isDead)
                 {
-                    image = Properties.Resources.PigDead;
-                    picPet.BackColor = Color.DarkGray;
+                    //image = Properties.Resources.PigDead;
+                    //picPet.BackColor = Color.DarkGray;
+                    this.BackgroundImage = Properties.Resources.PigDead;
                 }
                 else if (isSleeping)
                 {
-                    image = Properties.Resources.PigSleep1;
-                    picPet.BackColor = Color.LightBlue; // Голубой фон для сна
+                    //image = Properties.Resources.PigSleep1;
+                    //picPet.BackColor = Color.LightBlue; // Голубой фон для сна
+                    this.BackgroundImage = Properties.Resources.PigSleep1;
                 }
                 else if (isSick)
                 {
-                    image = Properties.Resources.PigSick1;
-                    picPet.BackColor = Color.LightYellow; // Желтый фон для болезни
+                    //image = Properties.Resources.PigSick1;
+                    //picPet.BackColor = Color.LightYellow; // Желтый фон для болезни
+                    this.BackgroundImage = Properties.Resources.PigSick1;
                 }
                 else if (energy <= 20)
                 {
-                    image = Properties.Resources.PigSleep11;
-                    picPet.BackColor = Color.LightCyan; // Бледно-голубой для усталости
+                    //image = Properties.Resources.PigSleep11;
+                    //picPet.BackColor = Color.LightCyan; // Бледно-голубой для усталости
+                    this.BackgroundImage = Properties.Resources.PigSleep11;
                     if (!isSick) lblStatus.Text = "Поросенок Визенау хочет спать!";
                 }
                 else if (hunger <= 20)
                 {
-                    image = Properties.Resources.PigHungry2;
-                    picPet.BackColor = Color.LightSalmon; // Розовый для голода
+                    //image = Properties.Resources.PigHungry2;
+                    //picPet.BackColor = Color.LightSalmon; // Розовый для голода
+                    this.BackgroundImage = Properties.Resources.PigHungry2;
                     if (!isSick) lblStatus.Text = "Поросенок Визенау голоден!";
                 }
                 else if (cleanliness <= 30)
                 {
-                    image = Properties.Resources.PigFlithy;
-                    picPet.BackColor = Color.LightSlateGray; // Серый для грязного
+                    //image = Properties.Resources.PigFlithy;
+                    //picPet.BackColor = Color.LightSlateGray; // Серый для грязного
+                    this.BackgroundImage = Properties.Resources.PigFlithy;
                     if (!isSick) lblStatus.Text = "Поросенок Визенау грязный!";
                 }
                 else if (happiness <= 20)
                 {
-                    image = Properties.Resources.PigSad1;
-                    picPet.BackColor = Color.LightSteelBlue; // Голубоватый для грусти
+                    //image = Properties.Resources.PigSad1;
+                    //picPet.BackColor = Color.LightSteelBlue; // Голубоватый для грусти
+                    this.BackgroundImage = Properties.Resources.PigSad1;
                     if (!isSick) lblStatus.Text = "Поросенок Визенау грустит!";
                 }
                 else if (hunger >= 80 && happiness >= 80 && cleanliness >= 80 && energy >= 80 && health >= 80)
                 {
-                    image = Properties.Resources.PigHappy1;
-                    picPet.BackColor = Color.LightGreen; // Зеленый для счастья
+                    //image = Properties.Resources.PigHappy1;
+                    //picPet.BackColor = Color.LightGreen; // Зеленый для счастья
+                    this.BackgroundImage = Properties.Resources.PigHappy1;
                 }
                 else
                 {
-                    image = Properties.Resources.Pig1;
-                    picPet.BackColor = Color.White; // Белый для нормального состояния
+                    //image = Properties.Resources.Pig1;
+                    //picPet.BackColor = Color.White; // Белый для нормального состояния
+                    this.BackgroundImage = Properties.Resources.Pig1;
                 }
 
                 if (image != null)
@@ -641,23 +654,26 @@ namespace Тамагоча_свинья
 
         private void ShowDefaultImage()
         {
-            Color backgroundColor = isDead ? Color.DarkGray :
-                                  isSleeping ? Color.LightBlue :
-                                  isSick ? Color.LightYellow :
-                                  Color.White;
+            //Color backgroundColor = isDead ? Color.DarkGray :
+            //                      isSleeping ? Color.LightBlue :
+            //                      isSick ? Color.LightYellow :
+            //                      Color.White;
 
-            picPet.BackColor = backgroundColor;
-            picPet.BorderStyle = BorderStyle.Fixed3D;
+            //picPet.BackColor = backgroundColor;
+            //picPet.BorderStyle = BorderStyle.Fixed3D;
+
 
             // Очищаем предыдущее изображение
-            picPet.Image = null;
+            //picPet.Image = null;
 
-            using (Graphics g = picPet.CreateGraphics())
+
+            //using (Graphics g = picPet.CreateGraphics())
+            using (Graphics g = Graphics.FromImage(this.BackgroundImage))
             using (Font titleFont = new Font("Arial", 14, FontStyle.Bold))
             using (Font stateFont = new Font("Arial", 11, FontStyle.Regular))
             using (Brush textBrush = new SolidBrush(Color.DarkBlue))
             {
-                g.Clear(backgroundColor);
+                //g.Clear(backgroundColor);
 
                 g.DrawString("Поросенок Визенау", titleFont, textBrush, new PointF(20, 80));
 
@@ -679,6 +695,7 @@ namespace Тамагоча_свинья
                 }
             }
         }
+
 
         // Новый метод для обработки смерти поросенка
         private void HandleDeath(string deathReason)
@@ -834,6 +851,7 @@ namespace Тамагоча_свинья
             }
         }
 
+
         private void btnHeal_Click(object sender, EventArgs e)
         {
             if (isSleeping || isDead) return;
@@ -864,6 +882,7 @@ namespace Тамагоча_свинья
                 UpdateStatus();
             }
         }
+
 
         private void btnSpeedUp_Click(object sender, EventArgs e)
         {
