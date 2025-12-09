@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Тамагоча_свинья
@@ -121,11 +116,11 @@ namespace Тамагоча_свинья
 
             int yPos = 360;
 
-            lblHunger = CreateLabel("Голод: 50%", yPos);
+            lblHunger = CreateLabel("Сытость: 50%", yPos);
             pbHunger = CreateProgressBar(yPos + 25);
             yPos += 50;
 
-            lblHappiness = CreateLabel("Счастье: 50%", yPos);
+            lblHappiness = CreateLabel("Настроение: 50%", yPos);
             pbHappiness = CreateProgressBar(yPos + 25);
             yPos += 50;
 
@@ -390,18 +385,18 @@ namespace Тамагоча_свинья
             UpdateStatus();
         }
 
-        // Новый метод для обновления ежедневных потребностей
+        // метод для обновления ежедневных потребностей
         private void UpdateDailyNeeds()
         {
             // Сбрасываем счетчики каждый день
             dailyFeedRequests = 0;
             dailySleepRequests = 0;
             dailyPlayRequests = 0;
+            dailyBathRequests = 0; // Сбрасываем всегда
 
             // Купание - каждый второй день
             if (dayCounter % 2 == 0)
             {
-                dailyBathRequests = 0;
                 maxBathRequests = 1;
             }
             else
@@ -453,7 +448,7 @@ namespace Тамагоча_свинья
                               (dailyPlayRequests >= maxPlayRequests) &&
                               (dailyBathRequests >= maxBathRequests);
 
-            if (allNeedsMet)
+            if (allNeedsMet && maxFeedRequests > 0) // Проверяем, что день не нулевой
             {
                 // Бонус за выполнение всех потребностей
                 happiness = Math.Min(100, happiness + 15);
@@ -461,10 +456,15 @@ namespace Тамагоча_свинья
                 lblStatus.Text = "Отличный день! Все потребности удовлетворены!";
                 lblStatus.ForeColor = Color.Green;
 
-
+                // Болезнь может улучшиться при хорошем уходе
                 if (isSick)
                 {
                     sickDays++;
+                    // 30% шанс улучшения состояния
+                    if (new Random().Next(100) < 30)
+                    {
+                        health = Math.Min(100, health + 15);
+                    }
                 }
 
                 // Переходим к следующему дню
@@ -486,8 +486,8 @@ namespace Тамагоча_свинья
             pbEnergy.Value = energy;
             pbHealth.Value = health;
 
-            lblHunger.Text = $"Голод: {hunger}%";
-            lblHappiness.Text = $"Счастье: {happiness}%";
+            lblHunger.Text = $"Сытость: {hunger}%";
+            lblHappiness.Text = $"Настроение: {happiness}%";
             lblCleanliness.Text = $"Чистота: {cleanliness}%";
             lblEnergy.Text = $"Энергия: {energy}%";
             lblHealth.Text = $"Здоровье: {health}%";
@@ -504,13 +504,15 @@ namespace Тамагоча_свинья
             CheckSickness();
         }
 
+
+
         private void CheckSickness()
         {
             // Поросенок заболевает, если чистота ниже или равна 10% и не болеет
             if (cleanliness <= 10 && !isSick && health > 0 && !isDead)
             {
                 isSick = true;
-                sickDays = 1; // устанавливаем 1 день болезни сразу
+                sickDays = 1;
                 lblStatus.Text = "Поросенок Визенау заболел от грязи!";
                 lblStatus.ForeColor = Color.Red;
                 MessageBox.Show("Поросенок Визенау заболел от грязи! Срочно лечите его!", "Болезнь",
@@ -520,6 +522,8 @@ namespace Тамагоча_свинья
             // Обновляем видимость кнопки лечения
             btnHeal.Visible = isSick && !isDead;
         }
+
+
 
         private void UpdateOverallStatus()
         {
@@ -554,6 +558,8 @@ namespace Тамагоча_свинья
                 lblStatus.ForeColor = Color.Blue;
             }
         }
+
+
 
         private void UpdatePetImage()
         {
@@ -631,6 +637,8 @@ namespace Тамагоча_свинья
         }
 
 
+
+
         private void ShowDefaultImage()
         {
             Color backgroundColor = isDead ? Color.DarkGray :
@@ -641,32 +649,33 @@ namespace Тамагоча_свинья
             picPet.BackColor = backgroundColor;
             picPet.BorderStyle = BorderStyle.Fixed3D;
 
+            // Очищаем предыдущее изображение
+            picPet.Image = null;
+
             using (Graphics g = picPet.CreateGraphics())
+            using (Font titleFont = new Font("Arial", 14, FontStyle.Bold))
+            using (Font stateFont = new Font("Arial", 11, FontStyle.Regular))
+            using (Brush textBrush = new SolidBrush(Color.DarkBlue))
             {
                 g.Clear(backgroundColor);
 
-                using (Font titleFont = new Font("Arial", 14, FontStyle.Bold))
-                using (Font stateFont = new Font("Arial", 11, FontStyle.Regular))
-                using (Brush textBrush = new SolidBrush(Color.DarkBlue))
+                g.DrawString("Поросенок Визенау", titleFont, textBrush, new PointF(20, 80));
+
+                string state = "";
+                if (isDead) state = "Мертвый";
+                else if (isSleeping) state = "Спит";
+                else if (isSick) state = "Больной";
+                else if (energy <= 20) state = "Сонный";
+                else if (hunger <= 20) state = "Голодный";
+                else if (cleanliness <= 30) state = "Грязный";
+                else if (happiness <= 20) state = "Грустный";
+                else state = "Нормальный";
+
+                g.DrawString($"Состояние: {state}", stateFont, textBrush, new PointF(20, 110));
+
+                if (!isDead)
                 {
-                    g.DrawString("Поросенок Визенау", titleFont, textBrush, new PointF(20, 80));
-
-                    string state = "";
-                    if (isDead) state = "Мертвый";
-                    else if (isSleeping) state = "Спит";
-                    else if (isSick) state = "Больной";
-                    else if (energy <= 20) state = "Сонный";
-                    else if (hunger <= 20) state = "Голодный";
-                    else if (cleanliness <= 30) state = "Грязный";
-                    else if (happiness <= 20) state = "Грустный";
-                    else state = "Нормальный";
-
-                    g.DrawString($"Состояние: {state}", stateFont, textBrush, new PointF(20, 110));
-
-                    if (!isDead)
-                    {
-                        g.DrawString($"День: {dayCounter}", stateFont, textBrush, new PointF(20, 135));
-                    }
+                    g.DrawString($"День: {dayCounter}", stateFont, textBrush, new PointF(20, 135));
                 }
             }
         }
@@ -1038,7 +1047,7 @@ namespace Тамагоча_свинья
                    (dailyPlayRequests >= maxPlayRequests) &&
                    (dailyBathRequests >= maxBathRequests);
         }
-
+        
         private void MainForm_Load(object sender, EventArgs e)
         {
             UpdatePetImage();
@@ -1046,3 +1055,4 @@ namespace Тамагоча_свинья
         }
     }
 }
+

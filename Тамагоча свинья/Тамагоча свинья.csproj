@@ -85,55 +85,63 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\Pig.gif" />
+    <None Include="PigsImage\Pig.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigFilthy.png" />
+    <None Include="PigsImage\PigHungry.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigHappy.png" />
+    <None Include="PigsImage\PigSick.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigHungry.png" />
+    <None Include="PigsImage\PigSleep.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigSad.png" />
+    <None Include="PigsImage\PigFlithy.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigSick.png" />
+    <None Include="PigsImage\PigSad.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigSleep.png" />
+    <None Include="PigsImage\PigHappy.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\Pig.jpg" />
+    <None Include="PigsImage\PigSleep1.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigHungry.jpg" />
+    <None Include="PigsImage\PigDied.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigSick.jpg" />
+    <None Include="PigsImage\PigHungry %282%29.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigSleep.jpg" />
+    <None Include="PigsImage\PigCleaning.mp4" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigFlithy.jpg" />
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PigsImage\PigSad.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PigsImage\PigHappy.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PigsImage\PigSleep1.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PigsImage\PigDied.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PigsImage\PigHungry %282%29.jpg" />
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
