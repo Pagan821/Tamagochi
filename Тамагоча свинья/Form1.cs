@@ -45,6 +45,15 @@ namespace Тамагоча_свинья
         {
             InitializeComponent();
             InitializeGame();
+
+            // Запретить изменение размера окна
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;  
+            this.MinimizeBox = false; 
+
+            this.Size = new Size(1280, 600);  
+            this.MaximumSize = this.Size;   
+            this.MinimumSize = this.Size;   
         }
 
         private void InitializeGame()
@@ -113,25 +122,51 @@ namespace Тамагоча_свинья
 
             if (allNeedsMet && maxFeedRequests > 0)
             {
+                // Увеличиваем счастье и здоровье
                 happiness = Math.Min(100, happiness + 15);
                 health = Math.Min(100, health + 10);
-                lblStatus.Text = "Отличный день! Все потребности удовлетворены!";
-                lblStatus.ForeColor = Color.Green;
 
+                // Проверяем состояние поросенка
                 if (isSick)
                 {
                     sickDays++;
+
+                    // Особое сообщение для больного поросенка
+                    lblStatus.Text = "День завершен, но поросенок неважно себя чувствует";
+                    lblStatus.ForeColor = Color.Orange;
+
+                    // Шанс на улучшение при хорошем уходе
                     if (new Random().Next(100) < 30)
                     {
                         health = Math.Min(100, health + 15);
                     }
+
+                    dayCounter++;
+                    UpdateDailyNeeds();
+
+                    MessageBox.Show($"День {dayCounter - 1} завершен!\n" +
+                                  $"Поросенок выполнил все задания, но всё ещё болен.\n" +
+                                  $"Он болеет уже {sickDays} дней.\n" +
+                                  $"Начинается день {dayCounter}.",
+                                  "Новый день (Поросенок болен)",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Warning);
                 }
+                else
+                {
+                    // Обычное сообщение для здорового поросенка
+                    lblStatus.Text = "Отличный день! Все потребности удовлетворены!";
+                    lblStatus.ForeColor = Color.Green;
 
-                dayCounter++;
-                UpdateDailyNeeds();
+                    dayCounter++;
+                    UpdateDailyNeeds();
 
-                MessageBox.Show($"День {dayCounter - 1} завершен! Поросенок счастлив!\nНачинается день {dayCounter}.", "Новый день",
-                              MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"День {dayCounter - 1} завершен! Поросенок счастлив!\n" +
+                                  $"Начинается день {dayCounter}.",
+                                  "Новый день",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Information);
+                }
 
                 UpdateOverallStatus();
             }

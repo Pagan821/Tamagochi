@@ -285,7 +285,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LightBlue;
-            this.ClientSize = new System.Drawing.Size(1280, 675);
+            this.ClientSize = new System.Drawing.Size(1237, 675);
             this.Controls.Add(this.btnRestart);
             this.Controls.Add(this.btnSpeedUp);
             this.Controls.Add(this.btnNormalSpeed);
